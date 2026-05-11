@@ -1,0 +1,35 @@
+common --announce_rc
+common --color=yes
+common --curses=yes
+common --check_direct_dependencies=warning
+
+build:base --cxxopt=-std=gnu++23
+build:base --cxxopt=-Wall
+build:base --cxxopt=-Wextra
+build:base --cxxopt=-Wpedantic
+build:base --cxxopt=-Wconversion
+build:base --cxxopt=-Wsign-conversion
+build:base --cxxopt=-Wcast-align
+build:base --cxxopt=-Wcast-qual
+build:base --cxxopt=-Wformat=2
+build:base --cxxopt=-Winit-self
+build:base --cxxopt=-Wmissing-declarations
+build:base --cxxopt=-Woverloaded-virtual
+build:base --cxxopt=-Wredundant-decls
+build:base --cxxopt=-Wundef
+
+build:strict --config=base
+build:strict --cxxopt=-Werror
+build:strict --strip=never
+build:strict --cxxopt=-fno-omit-frame-pointer
+build:strict --cxxopt=-O1
+build:strict --cxxopt=-g
+build:strict --cxxopt=-DADDRESS_SANITIZER
+build:strict --cxxopt=-DUNDEFINED_BEHAVIOR_SANITIZER
+build:strict --cxxopt=-fsanitize=address,undefined
+build:strict --linkopt=-fsanitize=address,undefined
+build --config=base
+
+test --color=yes
+test --test_output=all
+test --test_arg=--gtest_color=yes
