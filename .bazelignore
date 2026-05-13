@@ -1,3 +1,6 @@
+.cache
+.git
+.github
 bazel-out
 bazel-bin
 bazel-testlogs
