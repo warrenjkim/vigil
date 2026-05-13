@@ -1,0 +1,41 @@
+-- all accounts (checking, savings, brokerage, etc.)
+CREATE TABLE Accounts (
+  Id INTEGER PRIMARY KEY AUTOINCREMENT,
+  Name TEXT NOT NULL UNIQUE,
+  -- CHECKING, SAVINGS BROKERAGE, 401K, ROTH_IRA, TRADITIONAL_IRA,
+  Type TEXT NOT NULL
+);
+
+-- cash movements
+CREATE TABLE Transactions (
+  Id INTEGER PRIMARY KEY AUTOINCREMENT,
+  AccountId INTEGER NOT NULL REFERENCES Accounts (Id),
+  -- DEPOSIT, WITHDRAWAL, TRANSFER
+  Type TEXT NOT NULL,
+  Amount REAL NOT NULL,
+  TransferId INTEGER,
+  Description TEXT,
+  Timestamp INTEGER NOT NULL
+);
+
+-- current share positions
+CREATE TABLE Holdings (
+  Id INTEGER PRIMARY KEY AUTOINCREMENT,
+  AccountId INTEGER NOT NULL REFERENCES Accounts (Id),
+  Ticker TEXT NOT NULL,
+  Shares REAL NOT NULL,
+  UNIQUE (AccountId, Ticker)
+);
+
+-- investment movements
+CREATE TABLE Trades (
+  Id INTEGER PRIMARY KEY AUTOINCREMENT,
+  AccountId INTEGER NOT NULL REFERENCES Accounts (Id),
+  -- BUY, SELL
+  Type TEXT NOT NULL,
+  Ticker TEXT NOT NULL,
+  Shares REAL NOT NULL,
+  Price REAL NOT NULL,
+  Description TEXT,
+  Timestamp INTEGER NOT NULL
+);
