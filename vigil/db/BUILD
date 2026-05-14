@@ -31,3 +31,40 @@ cc_library(
         "@sqlite3",
     ],
 )
+
+cc_library(
+    name = "account",
+    hdrs = ["account.h"],
+    deps = [
+        "@pulse//core:enum_macros",
+        "@pulse//core:stringify",
+        "@pulse//dsa:error",
+        "@pulse//dsa:result",
+    ],
+)
+
+cc_library(
+    name = "accounts_dao",
+    srcs = ["accounts_dao.cc"],
+    hdrs = ["accounts_dao.h"],
+    deps = [
+        ":account",
+        ":database",
+        "@pulse//core:stringify",
+        "@pulse//dsa:error",
+        "@pulse//dsa:result",
+    ],
+)
+
+cc_test(
+    name = "accounts_dao_test",
+    srcs = ["accounts_dao_test.cc"],
+    deps = [
+        ":account",
+        ":accounts_dao",
+        ":database",
+        "@googletest//:gtest_main",
+        "@pulse//dsa:error",
+        "@sqlite3",
+    ],
+)
