@@ -4,6 +4,7 @@ cc_library(
     name = "database",
     hdrs = ["database.h"],
     data = [":schema.sql"],
+    visibility = ["//visibility:public"],
     deps = [
         ":sqlite_traits",
         "@pulse//dsa:error",
@@ -35,6 +36,7 @@ cc_library(
 cc_library(
     name = "account",
     hdrs = ["account.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "@pulse//core:enum_macros",
         "@pulse//core:stringify",
@@ -47,6 +49,7 @@ cc_library(
     name = "accounts_dao",
     srcs = ["accounts_dao.cc"],
     hdrs = ["accounts_dao.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":account",
         ":database",
