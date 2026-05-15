@@ -2,6 +2,7 @@ exports_files(["schema.sql"])
 
 cc_library(
     name = "database",
+    srcs = ["database.cc"],
     hdrs = ["database.h"],
     data = [":schema.sql"],
     visibility = ["//visibility:public"],
@@ -21,7 +22,6 @@ cc_test(
         "@googletest//:gtest_main",
         "@pulse//dsa:error",
         "@pulse//dsa:result",
-        "@sqlite3",
     ],
 )
 

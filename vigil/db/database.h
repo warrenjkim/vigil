@@ -1,12 +1,15 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 
+#include "dsa/error.h"
 #include "pulse/dsa/result.h"
 #include "sqlite3.h"
 #include "vigil/db/sqlite_traits.h"
@@ -15,7 +18,18 @@ namespace vigil {
 
 class Database {
  public:
-  explicit Database(sqlite3* db) : db_(db) {}
+  static pulse::Result<Database> Open(std::string_view path);
+
+  explicit Database() = default;
+
+  ~Database() = default;
+
+  // Movable and copyable.
+  Database(const Database&) = default;
+  Database& operator=(const Database&) = default;
+
+  Database(Database&&) noexcept = default;
+  Database& operator=(Database&&) noexcept = default;
 
   template <SqlCallback F = decltype([]() {})>
   pulse::Result<void> Execute(
@@ -24,26 +38,46 @@ class Database {
       F&& callback = {});
 
  private:
-  sqlite3* db_;
+  class Impl {
+   public:
+    explicit Impl(sqlite3* db) : db_(db) {}
+
+    ~Impl() { (void)sqlite3_close(db_); }
+
+    // Not copyable or movable.
+    Impl(const Impl&) = delete;
+    Impl& operator=(const Impl&) = delete;
+
+    sqlite3* handle() const { return db_; }
+
+   private:
+    sqlite3* db_;
+  };
+
+  explicit Database(std::shared_ptr<Impl> db) : db_(std::move(db)) {}
+
+  std::shared_ptr<Impl> db_;
 };
 
 // Implementation details below;
 
+// TODO(map sqlite error codes to pulse::Error::Codes)
 template <SqlCallback F>
 pulse::Result<void> Database::Execute(
     std::string_view sql, std::unordered_map<std::string, SqlValue> parameters,
     F&& callback) {
   sqlite3_stmt* stmt;
-  if (int err = sqlite3_prepare_v2(db_, sql.data(), /*nByte=*/-1, &stmt,
+  if (int err = sqlite3_prepare_v2(db_->handle(), sql.data(),
+                                   static_cast<int>(sql.size()), &stmt,
                                    /*pzTail=*/nullptr);
       err != SQLITE_OK) {
     return pulse::Error{.code = pulse::Error::Code::kInternal,
                         .message = "sqlite3_prepare_v2 failed: " +
-                                   std::string(sqlite3_errmsg(db_))};
+                                   std::string(sqlite3_errmsg(db_->handle()))};
   }
 
   for (const auto& [key, value] : parameters) {
-    int i = sqlite3_bind_parameter_index(stmt, key.data());
+    int i = sqlite3_bind_parameter_index(stmt, key.c_str());
     if (i == 0) {
       (void)sqlite3_finalize(stmt);
       return pulse::Error{
@@ -58,7 +92,7 @@ pulse::Result<void> Database::Execute(
             },
             value);
         err != SQLITE_OK) {
-      std::string msg = sqlite3_errmsg(db_);
+      std::string msg = sqlite3_errmsg(db_->handle());
       (void)sqlite3_finalize(stmt);
       return pulse::Error{
           .code = pulse::Error::Code::kInternal,
@@ -77,7 +111,7 @@ pulse::Result<void> Database::Execute(
   if (int err = sqlite3_finalize(stmt); err != SQLITE_OK) {
     return pulse::Error{.code = pulse::Error::Code::kInternal,
                         .message = "sqlite3_finalize failed: " +
-                                   std::string(sqlite3_errmsg(db_))};
+                                   std::string(sqlite3_errmsg(db_->handle()))};
   }
 
   return pulse::Result<void>{};

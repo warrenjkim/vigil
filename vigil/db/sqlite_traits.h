@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -63,10 +64,12 @@ struct Callback : Callback<decltype(&F::operator())> {};
 template <typename C, typename R, typename... Args>
 struct Callback<R (C::*)(Args...) const> {
   using ArgTypes = std::tuple<Args...>;
+  using ReturnType = R;
 };
 
 template <typename F>
 concept SqlCallback =
+    std::is_same_v<typename Callback<F>::ReturnType, void> &&
     []<std::size_t... Is>(std::index_sequence<Is...>) {
       return (
           true && ... &&
