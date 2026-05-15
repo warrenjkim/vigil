@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string_view>
+
+#include "pulse/dsa/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/database.h"
 

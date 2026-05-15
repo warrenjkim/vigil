@@ -1,8 +1,12 @@
 #include "vigil/db/accounts_dao.h"
 
 #include <optional>
+#include <string>
+#include <string_view>
 
+#include "dsa/error.h"
 #include "pulse/core/stringify.h"
+#include "pulse/dsa/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/database.h"
 
@@ -10,16 +14,12 @@ namespace vigil {
 
 AccountsDao::AccountsDao(Database db) : db_(db) {}
 
+// TODO(return pulse::Error::Code::kAlreadyExists for duplicates)
 pulse::Result<void> AccountsDao::InsertAccount(std::string_view name,
                                                Account::Type type) {
-  if (pulse::Result<void> err = db_.Execute(
-          R"sql(INSERT INTO Accounts (Name, Type) VALUES (:name, :type) )sql",
-          {{":name", name}, {":type", pulse::to_string(type)}});
-      !err.ok()) {
-    return err.error();
-  }
-
-  return pulse::Result<void>{};
+  return db_.Execute(
+      R"sql(INSERT INTO Accounts (Name, Type) VALUES (:name, :type) )sql",
+      {{":name", name}, {":type", pulse::to_string(type)}});
 }
 
 pulse::Result<Account> AccountsDao::GetAccount(std::string_view name) {
