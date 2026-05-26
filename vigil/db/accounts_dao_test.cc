@@ -22,15 +22,8 @@ class AccountDaoTest : public ::testing::Test {
     ASSERT_TRUE(db.ok()) << db.error().message;
     db_.emplace(std::move(*db));
 
-    auto create = db_->Execute(R"sql(
-CREATE TABLE Accounts (
-  Id INTEGER PRIMARY KEY AUTOINCREMENT,
-  Name TEXT NOT NULL UNIQUE,
-  Type TEXT NOT NULL
-);
-)sql");
-    ASSERT_TRUE(create.ok()) << create.error().message;
-
+    pulse::Result<void> err = db_->Initialize();
+    ASSERT_TRUE(err.ok()) << err.error().message;
     dao_.emplace(*db_);
   }
 

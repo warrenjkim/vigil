@@ -1,4 +1,21 @@
-exports_files(["schema.sql"])
+genrule(
+    name = "schema_sql_h",
+    srcs = ["schema.sql"],
+    outs = ["schema_sql.h"],
+    cmd = """(
+        echo '#pragma once'
+        echo 'namespace vigil {'
+        echo 'inline constexpr char kSchemaSql[] = R"sql('
+        cat $(location schema.sql)
+        echo ')sql";'
+        echo '}  // namespace vigil'
+    ) > $@""",
+)
+
+cc_library(
+    name = "schema_sql",
+    hdrs = ["schema_sql.h"],
+)
 
 cc_library(
     name = "database",
@@ -7,6 +24,7 @@ cc_library(
     data = [":schema.sql"],
     visibility = ["//visibility:public"],
     deps = [
+        ":schema_sql",
         ":sqlite_traits",
         "@pulse//core:error",
         "@pulse//core:result",
@@ -19,9 +37,11 @@ cc_test(
     srcs = ["database_test.cc"],
     deps = [
         ":database",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@pulse//core:error",
         "@pulse//core:result",
+        "@pulse//core:result_or_die",
     ],
 )
 
@@ -66,8 +86,10 @@ cc_test(
         ":account",
         ":accounts_dao",
         ":database",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@pulse//core:error",
+        "@pulse//core:result",
         "@sqlite3",
     ],
 )

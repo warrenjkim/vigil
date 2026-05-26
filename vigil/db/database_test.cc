@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "pulse/core/error.h"
 #include "pulse/core/result.h"
+#include "pulse/core/result_or_die.h"
 
 namespace vigil {
 
@@ -83,6 +84,38 @@ TEST_F(DatabaseTest, ExecuteCreateAndQuery) {
   EXPECT_THAT(rows[0].second, StrEq("test"));
   EXPECT_THAT(rows[1].first, Eq(2));
   EXPECT_THAT(rows[1].second, StrEq("test_2"));
+}
+
+TEST_F(DatabaseTest, InitializeAppliesSchema) {
+  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  ASSERT_TRUE(db.Initialize().ok());
+
+  int count = -1;
+  ASSERT_TRUE(db.Execute("SELECT COUNT(*) FROM Accounts;", {}, [&count](int c) {
+                  count = c;
+                }).ok());
+  EXPECT_THAT(count, Eq(0));
+
+  int version = -1;
+  ASSERT_TRUE(db.Execute("PRAGMA user_version;", {}, [&version](int v) {
+                  version = v;
+                }).ok());
+  EXPECT_THAT(version, Eq(1));
+}
+
+TEST_F(DatabaseTest, InitializeIsIdempotent) {
+  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  ASSERT_TRUE(db.Initialize().ok());
+  EXPECT_TRUE(db.Initialize().ok());
+}
+
+TEST_F(DatabaseTest, RejectsUnknownVersion) {
+  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  ASSERT_TRUE(db.Execute("PRAGMA user_version = 99;").ok());
+
+  pulse::Result<void> result = db.Initialize();
+  EXPECT_FALSE(result.ok());
+  EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kInternal));
 }
 
 }  // namespace

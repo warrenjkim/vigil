@@ -31,6 +31,8 @@ class Database {
   Database(Database&&) noexcept = default;
   Database& operator=(Database&&) noexcept = default;
 
+  pulse::Result<void> Initialize();
+
   template <SqlCallback F = decltype([]() {})>
   pulse::Result<void> Execute(
       std::string_view sql,

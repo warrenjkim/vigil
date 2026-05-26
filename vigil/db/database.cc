@@ -8,8 +8,15 @@
 #include "pulse/core/error.h"
 #include "pulse/core/result.h"
 #include "sqlite3.h"
+#include "vigil/db/schema_sql.h"
 
 namespace vigil {
+
+namespace {
+
+constexpr int kSchemaVersion = 1;
+
+}
 
 pulse::Result<Database> Database::Open(std::string_view path) {
   sqlite3* raw = nullptr;
@@ -47,6 +54,46 @@ pulse::Result<Database> Database::Open(std::string_view path) {
   }
 
   return db;
+}
+
+pulse::Result<void> Database::Initialize() {
+  int version = 0;
+  if (pulse::Result<void> err =
+          Execute("PRAGMA user_version;", /*parameters=*/{},
+                  [&version](int v) { version = v; });
+      !err.ok()) {
+    return err.error();
+  }
+
+  if (version == kSchemaVersion) {
+    return pulse::Result<void>{};
+  }
+
+  if (version != 0) {
+    return pulse::Error{
+        .code = pulse::Error::Code::kInternal,
+        .message = "unexpected schema version: " + std::to_string(version) +
+                   " (binary expects " + std::to_string(kSchemaVersion) + ")"};
+  }
+
+  const std::string sql =
+      std::string("BEGIN;\n") + kSchemaSql +
+      "\nPRAGMA user_version = " + std::to_string(kSchemaVersion) +
+      ";\nCOMMIT;";
+
+  char* sql_err = nullptr;
+  if (int err = sqlite3_exec(db_->handle(), sql.c_str(), /*callback=*/nullptr,
+                             /*arg=*/nullptr, &sql_err);
+      err != SQLITE_OK) {
+    std::string msg = sql_err != nullptr ? sql_err : sqlite3_errstr(err);
+    sqlite3_free(sql_err);
+    (void)sqlite3_exec(db_->handle(), "ROLLBACK;", /*callback=*/nullptr,
+                       /*arg=*/nullptr, /*errmsg=*/nullptr);
+    return pulse::Error{.code = pulse::Error::Code::kInternal,
+                        .message = "schema initialization failed: " + msg};
+  }
+
+  return pulse::Result<void>{};
 }
 
 }  // namespace vigil
