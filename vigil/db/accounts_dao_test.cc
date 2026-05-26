@@ -3,10 +3,10 @@
 #include <optional>
 #include <utility>
 
-#include "dsa/error.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "pulse/dsa/result.h"
+#include "pulse/core/error.h"
+#include "pulse/core/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/database.h"
 

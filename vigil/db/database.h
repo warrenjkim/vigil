@@ -9,8 +9,8 @@
 #include <unordered_map>
 #include <utility>
 
-#include "dsa/error.h"
-#include "pulse/dsa/result.h"
+#include "pulse/core/error.h"
+#include "pulse/core/result.h"
 #include "sqlite3.h"
 #include "vigil/db/sqlite_traits.h"
 

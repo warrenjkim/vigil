@@ -8,8 +8,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":sqlite_traits",
-        "@pulse//dsa:error",
-        "@pulse//dsa:result",
+        "@pulse//core:error",
+        "@pulse//core:result",
         "@sqlite3",
     ],
 )
@@ -20,8 +20,8 @@ cc_test(
     deps = [
         ":database",
         "@googletest//:gtest_main",
-        "@pulse//dsa:error",
-        "@pulse//dsa:result",
+        "@pulse//core:error",
+        "@pulse//core:result",
     ],
 )
 
@@ -39,9 +39,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@pulse//core:enum_macros",
+        "@pulse//core:error",
+        "@pulse//core:result",
         "@pulse//core:stringify",
-        "@pulse//dsa:error",
-        "@pulse//dsa:result",
     ],
 )
 
@@ -53,9 +53,9 @@ cc_library(
     deps = [
         ":account",
         ":database",
+        "@pulse//core:error",
+        "@pulse//core:result",
         "@pulse//core:stringify",
-        "@pulse//dsa:error",
-        "@pulse//dsa:result",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
         ":accounts_dao",
         ":database",
         "@googletest//:gtest_main",
-        "@pulse//dsa:error",
+        "@pulse//core:error",
         "@sqlite3",
     ],
 )

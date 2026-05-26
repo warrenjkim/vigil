@@ -7,8 +7,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "pulse/dsa/error.h"
-#include "pulse/dsa/result.h"
+#include "pulse/core/error.h"
+#include "pulse/core/result.h"
 
 namespace vigil {
 

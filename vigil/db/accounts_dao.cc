@@ -4,9 +4,9 @@
 #include <string>
 #include <string_view>
 
-#include "dsa/error.h"
+#include "pulse/core/error.h"
+#include "pulse/core/result.h"
 #include "pulse/core/stringify.h"
-#include "pulse/dsa/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/database.h"
 

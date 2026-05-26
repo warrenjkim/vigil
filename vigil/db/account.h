@@ -16,7 +16,7 @@ namespace vigil {
   X(kTraditionalIra, "TRADITIONAL_IRA")
 
 struct Account {
-  PULSE_ENUM(Type, ACCOUNT_TYPE_TABLE)
+  PULSE_ENUM(Type, ACCOUNT_TYPE_TABLE);
 
   int id;
   std::string name;
@@ -25,11 +25,11 @@ struct Account {
   friend bool operator==(const Account&, const Account&) = default;
 };
 
-PULSE_STRING_TO_ENUM(Account::Type, to_account_type, ACCOUNT_TYPE_TABLE)
+PULSE_STRING_TO_ENUM(Account::Type, to_account_type, ACCOUNT_TYPE_TABLE);
 
 }  // namespace vigil
 
-PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE)
+PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE);
 
 template <>
 struct pulse::Stringify<vigil::Account> {

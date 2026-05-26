@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-#include "pulse/dsa/result.h"
+#include "pulse/core/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/database.h"
 

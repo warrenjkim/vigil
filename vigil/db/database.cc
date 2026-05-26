@@ -5,8 +5,8 @@
 #include <string_view>
 #include <utility>
 
-#include "dsa/error.h"
-#include "pulse/dsa/result.h"
+#include "pulse/core/error.h"
+#include "pulse/core/result.h"
 #include "sqlite3.h"
 
 namespace vigil {
