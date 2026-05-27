@@ -6,6 +6,11 @@
 
 namespace vigil {
 
+class AccountsDao;
+
 std::unique_ptr<pulse::http::Handler> MakeHealthHandler();
 
-}
+std::unique_ptr<pulse::http::Handler> MakeGetAccountHandler(
+    AccountsDao* accounts_dao);
+
+}  // namespace vigil

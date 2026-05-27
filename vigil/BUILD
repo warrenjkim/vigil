@@ -36,5 +36,39 @@ cc_test(
         ":handler_registry",
         ":health_handler",
         "@googletest//:gtest_main",
+
+cc_library(
+    name = "get_account_handler",
+    srcs = ["get_account_handler.cc"],
+    deps = [
+        ":handler_registry",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "@pulse//core:result",
+        "@pulse//core:stringify",
+        "@pulse//http:handler",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
+
+cc_test(
+    name = "get_account_handler_test",
+    srcs = ["get_account_handler_test.cc"],
+    deps = [
+        ":get_account_handler",
+        ":handler_registry",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//core:result_or_die",
+        "@pulse//http:handler",
+        "@pulse//http:method",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
     ],
 )
