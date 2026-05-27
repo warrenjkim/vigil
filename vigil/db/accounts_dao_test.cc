@@ -31,9 +31,9 @@ class AccountDaoTest : public ::testing::Test {
   std::optional<AccountsDao> dao_;
 };
 
-TEST_F(AccountDaoTest, InsertAndGet) {
+TEST_F(AccountDaoTest, CreateAndGet) {
   ASSERT_TRUE(
-      dao_->InsertAccount("Chase Checking", Account::Type::kChecking).ok());
+      dao_->CreateAccount("Chase Checking", Account::Type::kChecking).ok());
 
   auto result = dao_->GetAccount("Chase Checking");
   ASSERT_TRUE(result.ok()) << result.error().message;
@@ -48,10 +48,10 @@ TEST_F(AccountDaoTest, NotFound) {
   EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kNotFound));
 }
 
-TEST_F(AccountDaoTest, DuplicateInsertFails) {
+TEST_F(AccountDaoTest, DuplicateCreateFails) {
   ASSERT_TRUE(
-      dao_->InsertAccount("Chase Checking", Account::Type::kChecking).ok());
-  auto result = dao_->InsertAccount("Chase Checking", Account::Type::kChecking);
+      dao_->CreateAccount("Chase Checking", Account::Type::kChecking).ok());
+  auto result = dao_->CreateAccount("Chase Checking", Account::Type::kChecking);
   EXPECT_FALSE(result.ok());
 }
 

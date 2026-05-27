@@ -12,15 +12,15 @@ namespace vigil {
 
 namespace {
 
-class InsertAccountHandler final : public pulse::http::Handler {
+class CreateAccountHandler final : public pulse::http::Handler {
  public:
-  explicit InsertAccountHandler(AccountsDao* dao) : dao(*dao) {}
+  explicit CreateAccountHandler(AccountsDao* dao) : dao(*dao) {}
 
   pulse::http::Response operator()(
       const pulse::http::Request& request) const override {
     auto name = request.query_params.find("name");
     if (name == request.query_params.end()) {
-      pulse::Log() << "InsertAccount: missing parameter 'name'";
+      pulse::Log() << "CreateAccount: missing parameter 'name'";
       return pulse::http::Response{.content_type = "application/json",
                                    .status = 400,
                                    .body = R"({"status": "invalid argument"})"};
@@ -28,7 +28,7 @@ class InsertAccountHandler final : public pulse::http::Handler {
 
     auto type = request.query_params.find("type");
     if (type == request.query_params.end()) {
-      pulse::Log() << "InsertAccount: missing parameter 'type'\n";
+      pulse::Log() << "CreateAccount: missing parameter 'type'\n";
       return pulse::http::Response{.content_type = "application/json",
                                    .status = 400,
                                    .body = R"({"status": "invalid argument"})"};
@@ -36,27 +36,27 @@ class InsertAccountHandler final : public pulse::http::Handler {
 
     Account::Type account_type = to_account_type(type->second);
     if (account_type == Account::Type::kUnknown) {
-      pulse::Log() << "InsertAccount: unrecognized type '" << type->second
+      pulse::Log() << "CreateAccount: unrecognized type '" << type->second
                    << "'";
       return pulse::http::Response{.content_type = "application/json",
                                    .status = 400,
                                    .body = R"({"status": "invalid argument"})"};
     }
 
-    pulse::Log() << "InsertAccount: handling request (name='" << name->second
+    pulse::Log() << "CreateAccount: handling request (name='" << name->second
                  << "', type='" << type->second << "')";
 
     if (pulse::Result<void> account =
-            dao.InsertAccount(name->second, account_type);
+            dao.CreateAccount(name->second, account_type);
         !account.ok()) {
-      pulse::Log() << "InsertAccount: insert failed: "
+      pulse::Log() << "CreateAccount: create failed: "
                    << account.error().message;
       return pulse::http::Response{.content_type = "application/json",
                                    .status = 500,
                                    .body = R"({"status": "internal"})"};
     }
 
-    pulse::Log() << "InsertAccount: insert succeeded (name='" << name->second
+    pulse::Log() << "CreateAccount: create succeeded (name='" << name->second
                  << "')";
 
     return pulse::http::Response{
@@ -69,9 +69,9 @@ class InsertAccountHandler final : public pulse::http::Handler {
 
 }  // namespace
 
-std::unique_ptr<pulse::http::Handler> MakeInsertAccountHandler(
+std::unique_ptr<pulse::http::Handler> MakeCreateAccountHandler(
     AccountsDao* dao) {
-  return std::make_unique<InsertAccountHandler>(dao);
+  return std::make_unique<CreateAccountHandler>(dao);
 }
 
 }  // namespace vigil

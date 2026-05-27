@@ -2,10 +2,11 @@ cc_library(
     name = "handlers",
     visibility = ["//visibility:public"],
     deps = [
+        ":create_account_handler",
+        ":delete_account_handler",
         ":get_account_handler",
         ":handler_registry",
         ":health_handler",
-        ":insert_account_handler",
     ],
 )
 

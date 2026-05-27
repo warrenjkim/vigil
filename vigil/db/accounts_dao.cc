@@ -15,7 +15,7 @@ namespace vigil {
 AccountsDao::AccountsDao(Database db) : db_(db) {}
 
 // TODO(return pulse::Error::Code::kAlreadyExists for duplicates)
-pulse::Result<void> AccountsDao::InsertAccount(std::string_view name,
+pulse::Result<void> AccountsDao::CreateAccount(std::string_view name,
                                                Account::Type type) {
   return db_.Execute(
       R"sql(INSERT INTO Accounts (Name, Type) VALUES (:name, :type) )sql",

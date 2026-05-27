@@ -20,14 +20,14 @@ namespace {
 using ::testing::Eq;
 using ::testing::NotNull;
 
-class InsertAccountHandlerTest : public ::testing::Test {
+class CreateAccountHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
     db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
     pulse::die_if_error(db_.Initialize());
 
     dao_ = std::make_unique<AccountsDao>(db_);
-    handler_ = MakeInsertAccountHandler(dao_.get());
+    handler_ = MakeCreateAccountHandler(dao_.get());
 
     ASSERT_THAT(handler_, NotNull());
   }
@@ -37,7 +37,7 @@ class InsertAccountHandlerTest : public ::testing::Test {
   std::unique_ptr<pulse::http::Handler> handler_;
 };
 
-TEST_F(InsertAccountHandlerTest, InsertAccount) {
+TEST_F(CreateAccountHandlerTest, CreateAccount) {
   EXPECT_THAT(
       (*handler_)(pulse::http::Request{
           .query_params = {{"name", "checking"},
@@ -47,7 +47,7 @@ TEST_F(InsertAccountHandlerTest, InsertAccount) {
           .content_type = "text/plain", .status = 201, .body = "Created"}));
 }
 
-TEST_F(InsertAccountHandlerTest, PersistsAccount) {
+TEST_F(CreateAccountHandlerTest, PersistsAccount) {
   ASSERT_THAT(
       (*handler_)(
           pulse::http::Request{
@@ -64,7 +64,7 @@ TEST_F(InsertAccountHandlerTest, PersistsAccount) {
                                    .type = Account::Type::kChecking}));
 }
 
-TEST_F(InsertAccountHandlerTest, MissingNameParam) {
+TEST_F(CreateAccountHandlerTest, MissingNameParam) {
   EXPECT_THAT(
       (*handler_)(
           pulse::http::Request{
@@ -74,14 +74,14 @@ TEST_F(InsertAccountHandlerTest, MissingNameParam) {
       Eq(400));
 }
 
-TEST_F(InsertAccountHandlerTest, MissingTypeParam) {
+TEST_F(CreateAccountHandlerTest, MissingTypeParam) {
   EXPECT_THAT(
       (*handler_)(pulse::http::Request{.query_params = {{"name", "checking"}}})
           .status,
       Eq(400));
 }
 
-TEST_F(InsertAccountHandlerTest, UnrecognizedType) {
+TEST_F(CreateAccountHandlerTest, UnrecognizedType) {
   EXPECT_THAT(
       (*handler_)(pulse::http::Request{.query_params = {{"name", "checking"},
                                                         {"type", "bad_type"}}})
@@ -89,9 +89,9 @@ TEST_F(InsertAccountHandlerTest, UnrecognizedType) {
       Eq(400));
 }
 
-TEST_F(InsertAccountHandlerTest, DuplicateInsert) {
+TEST_F(CreateAccountHandlerTest, DuplicateCreate) {
   pulse::die_if_error(
-      dao_->InsertAccount("checking", Account::Type::kChecking));
+      dao_->CreateAccount("checking", Account::Type::kChecking));
   EXPECT_THAT(
       (*handler_)(
           pulse::http::Request{

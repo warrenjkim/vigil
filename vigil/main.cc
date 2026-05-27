@@ -23,7 +23,7 @@ int main() {
                                  vigil::MakeGetAccountHandler(&accounts_dao)));
   pulse::die_if_error(
       router.add(pulse::http::Method::kPost, "/accounts",
-                 vigil::MakeInsertAccountHandler(&accounts_dao)));
+                 vigil::MakeCreateAccountHandler(&accounts_dao)));
 
   pulse::http::Server server(std::move(router), {.port = 8080, .threads = 1});
 

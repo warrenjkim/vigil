@@ -44,7 +44,7 @@ TEST_F(GetAccountHandlerTest, NotFound) {
 
 TEST_F(GetAccountHandlerTest, GetAccount) {
   pulse::die_if_error(
-      dao_->InsertAccount("checking", Account::Type::kChecking));
+      dao_->CreateAccount("checking", Account::Type::kChecking));
 
   EXPECT_THAT(
       (*handler_)(pulse::http::Request{.path_params = {{"name", "checking"}}}),

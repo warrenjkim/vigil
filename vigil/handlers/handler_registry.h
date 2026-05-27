@@ -13,7 +13,7 @@ std::unique_ptr<pulse::http::Handler> MakeHealthHandler();
 std::unique_ptr<pulse::http::Handler> MakeGetAccountHandler(
     AccountsDao* accounts_dao);
 
-std::unique_ptr<pulse::http::Handler> MakeInsertAccountHandler(
+std::unique_ptr<pulse::http::Handler> MakeCreateAccountHandler(
     AccountsDao* dao);
 
 }  // namespace vigil
