@@ -5,7 +5,7 @@
 #include "pulse/http/handler.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
-#include "vigil/handler_registry.h"
+#include "vigil/handlers/handler_registry.h"
 
 namespace vigil {
 

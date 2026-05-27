@@ -11,7 +11,7 @@
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
-#include "vigil/handler_registry.h"
+#include "vigil/handlers/handler_registry.h"
 
 namespace vigil {
 

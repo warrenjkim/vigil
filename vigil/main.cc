@@ -8,7 +8,7 @@
 #include "pulse/http/server.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
-#include "vigil/handler_registry.h"
+#include "vigil/handlers/handler_registry.h"
 
 int main() {
   vigil::Database db = pulse::unwrap_or_die(vigil::Database::Open("vigil.db"));
