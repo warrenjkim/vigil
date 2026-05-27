@@ -19,11 +19,14 @@ int main() {
   pulse::http::Router router;
   pulse::die_if_error(router.add(pulse::http::Method::kGet, "/health",
                                  vigil::MakeHealthHandler()));
-  pulse::die_if_error(router.add(pulse::http::Method::kGet, "/accounts/{name}",
-                                 vigil::MakeGetAccountHandler(&accounts_dao)));
   pulse::die_if_error(
       router.add(pulse::http::Method::kPost, "/accounts",
                  vigil::MakeCreateAccountHandler(&accounts_dao)));
+  pulse::die_if_error(router.add(pulse::http::Method::kGet, "/accounts/{name}",
+                                 vigil::MakeGetAccountHandler(&accounts_dao)));
+  pulse::die_if_error(
+      router.add(pulse::http::Method::kDelete, "/accounts/{name}",
+                 vigil::MakeDeleteAccountHandler(&accounts_dao)));
 
   pulse::http::Server server(std::move(router), {.port = 8080, .threads = 1});
 

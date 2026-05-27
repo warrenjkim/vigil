@@ -10,10 +10,13 @@ class AccountsDao;
 
 std::unique_ptr<pulse::http::Handler> MakeHealthHandler();
 
+std::unique_ptr<pulse::http::Handler> MakeCreateAccountHandler(
+    AccountsDao* dao);
+
 std::unique_ptr<pulse::http::Handler> MakeGetAccountHandler(
     AccountsDao* accounts_dao);
 
-std::unique_ptr<pulse::http::Handler> MakeCreateAccountHandler(
+std::unique_ptr<pulse::http::Handler> MakeDeleteAccountHandler(
     AccountsDao* dao);
 
 }  // namespace vigil

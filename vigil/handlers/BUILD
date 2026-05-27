@@ -44,6 +44,43 @@ cc_test(
 )
 
 cc_library(
+    name = "create_account_handler",
+    srcs = ["create_account_handler.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":handler_registry",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "@pulse//core:log",
+        "@pulse//core:result",
+        "@pulse//http:handler",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
+
+cc_test(
+    name = "create_account_handler_test",
+    srcs = ["create_account_handler_test.cc"],
+    deps = [
+        ":create_account_handler",
+        ":handler_registry",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//core:result",
+        "@pulse//core:result_or_die",
+        "@pulse//core:stringify",
+        "@pulse//http:handler",
+        "@pulse//http:method",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
+
+cc_library(
     name = "get_account_handler",
     srcs = ["get_account_handler.cc"],
     visibility = ["//visibility:public"],
@@ -80,8 +117,8 @@ cc_test(
 )
 
 cc_library(
-    name = "insert_account_handler",
-    srcs = ["insert_account_handler.cc"],
+    name = "delete_account_handler",
+    srcs = ["delete_account_handler.cc"],
     visibility = ["//visibility:public"],
     deps = [
         ":handler_registry",
@@ -96,11 +133,11 @@ cc_library(
 )
 
 cc_test(
-    name = "insert_account_handler_test",
-    srcs = ["insert_account_handler_test.cc"],
+    name = "delete_account_handler_test",
+    srcs = ["delete_account_handler_test.cc"],
     deps = [
+        ":delete_account_handler",
         ":handler_registry",
-        ":insert_account_handler",
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
