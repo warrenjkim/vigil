@@ -49,7 +49,7 @@ class InsertAccountHandler final : public pulse::http::Handler {
     if (pulse::Result<void> account =
             dao.InsertAccount(name->second, account_type);
         !account.ok()) {
-      pulse::Log() << "] InsertAccount: insert failed: "
+      pulse::Log() << "InsertAccount: insert failed: "
                    << account.error().message;
       return pulse::http::Response{.content_type = "application/json",
                                    .status = 500,
