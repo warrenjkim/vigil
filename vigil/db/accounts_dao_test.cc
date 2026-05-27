@@ -11,6 +11,7 @@
 #include "vigil/db/database.h"
 
 namespace vigil {
+
 namespace {
 
 using ::testing::Eq;
@@ -55,5 +56,37 @@ TEST_F(AccountDaoTest, DuplicateCreateFails) {
   EXPECT_FALSE(result.ok());
 }
 
+TEST_F(AccountDaoTest, DeleteAccount) {
+  ASSERT_TRUE(
+      dao_->CreateAccount("Chase Checking", Account::Type::kChecking).ok());
+
+  pulse::Result<void> deleted = dao_->DeleteAccount("Chase Checking");
+  ASSERT_TRUE(deleted.ok()) << deleted.error().message;
+
+  auto result = dao_->GetAccount("Chase Checking");
+  EXPECT_FALSE(result.ok());
+  EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kNotFound));
+}
+
+TEST_F(AccountDaoTest, DeleteThenRecreate) {
+  ASSERT_TRUE(
+      dao_->CreateAccount("Chase Checking", Account::Type::kChecking).ok());
+  ASSERT_TRUE(dao_->DeleteAccount("Chase Checking").ok());
+
+  EXPECT_TRUE(
+      dao_->CreateAccount("Chase Checking", Account::Type::kSavings).ok());
+}
+
+TEST_F(AccountDaoTest, DeleteAccountLeavesOthers) {
+  ASSERT_TRUE(dao_->CreateAccount("Checking", Account::Type::kChecking).ok());
+  ASSERT_TRUE(dao_->CreateAccount("Savings", Account::Type::kSavings).ok());
+
+  ASSERT_TRUE(dao_->DeleteAccount("Checking").ok());
+
+  EXPECT_FALSE(dao_->GetAccount("Checking").ok());
+  EXPECT_TRUE(dao_->GetAccount("Savings").ok());
+}
+
 }  // namespace
+
 }  // namespace vigil

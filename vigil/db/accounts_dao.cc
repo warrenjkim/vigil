@@ -41,4 +41,9 @@ pulse::Result<Account> AccountsDao::GetAccount(std::string_view name) {
   return *account;
 }
 
+pulse::Result<void> AccountsDao::DeleteAccount(std::string_view name) {
+  return db_.Execute(R"sql(DELETE FROM Accounts WHERE Name = :name)sql",
+                     {{":name", name}});
+}
+
 }  // namespace vigil

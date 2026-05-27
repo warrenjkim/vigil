@@ -16,6 +16,8 @@ class AccountsDao {
 
   pulse::Result<Account> GetAccount(std::string_view name);
 
+  pulse::Result<void> DeleteAccount(std::string_view name);
+
  private:
   Database db_;
 };
