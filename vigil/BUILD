@@ -70,5 +70,38 @@ cc_test(
         "@pulse//http:response",
     ],
 )
+
+cc_library(
+    name = "insert_account_handler",
+    srcs = ["insert_account_handler.cc"],
+    deps = [
+        ":handler_registry",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "@pulse//core:result",
+        "@pulse//http:handler",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
+
+cc_test(
+    name = "insert_account_handler_test",
+    srcs = ["insert_account_handler_test.cc"],
+    deps = [
+        ":handler_registry",
+        ":insert_account_handler",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//core:result",
+        "@pulse//core:result_or_die",
+        "@pulse//core:stringify",
+        "@pulse//http:handler",
+        "@pulse//http:method",
+        "@pulse//http:request",
+        "@pulse//http:response",
     ],
 )
