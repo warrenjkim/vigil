@@ -3,6 +3,7 @@ common --color=yes
 common --curses=yes
 common --check_direct_dependencies=warning
 
+build:base --features=layering_check
 build:base --cxxopt=-std=gnu++23
 build:base --cxxopt=-Wall
 build:base --cxxopt=-Wextra
