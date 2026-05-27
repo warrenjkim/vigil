@@ -3,6 +3,7 @@
 
 #include "http/method.h"
 #include "http/router.h"
+#include "pulse/core/result_or_die.h"
 #include "pulse/http/router.h"
 #include "pulse/http/server.h"
 #include "vigil/db/accounts_dao.h"
@@ -10,18 +11,19 @@
 #include "vigil/handler_registry.h"
 
 int main() {
-  // TODO(create a helper function to unwrap or crash)
-  vigil::Database db = *vigil::Database::Open("vigil.db");
+  vigil::Database db = pulse::unwrap_or_die(vigil::Database::Open("vigil.db"));
+  pulse::die_if_error(db.Initialize());
 
   vigil::AccountsDao accounts_dao(db);
 
   pulse::http::Router router;
-  if (!router
-           .add(pulse::http::Method::kGet, "/health",
-                vigil::MakeHealthHandler())
-           .ok()) {
-    std::exit(1);
-  }
+  pulse::die_if_error(router.add(pulse::http::Method::kGet, "/health",
+                                 vigil::MakeHealthHandler()));
+  pulse::die_if_error(router.add(pulse::http::Method::kGet, "/accounts/{name}",
+                                 vigil::MakeGetAccountHandler(&accounts_dao)));
+  pulse::die_if_error(
+      router.add(pulse::http::Method::kPost, "/accounts",
+                 vigil::MakeInsertAccountHandler(&accounts_dao)));
 
   pulse::http::Server server(std::move(router), {.port = 8080, .threads = 1});
 

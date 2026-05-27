@@ -3,10 +3,16 @@ cc_binary(
     srcs = ["main.cc"],
     visibility = ["//visibility:public"],
     deps = [
+        ":get_account_handler",
         ":handler_registry",
         ":health_handler",
+        ":insert_account_handler",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "@pulse//core:result_or_die",
         "@pulse//http:handler",
         "@pulse//http:method",
+        "@pulse//http:router",
         "@pulse//http:server",
     ],
 )
@@ -35,7 +41,13 @@ cc_test(
     deps = [
         ":handler_registry",
         ":health_handler",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
+        "@pulse//http:handler",
+        "@pulse//http:request",
+        "@pulse//http:response",
+    ],
+)
 
 cc_library(
     name = "get_account_handler",
