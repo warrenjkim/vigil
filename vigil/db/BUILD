@@ -26,8 +26,8 @@ cc_library(
     deps = [
         ":schema_sql",
         ":sqlite_traits",
-        "@pulse//core:error",
-        "@pulse//core:result",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
         "@sqlite3",
     ],
 )
@@ -39,9 +39,9 @@ cc_test(
         ":database",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
-        "@pulse//core:error",
-        "@pulse//core:result",
-        "@pulse//core:result_or_die",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:result_or_die",
     ],
 )
 
@@ -58,10 +58,8 @@ cc_library(
     hdrs = ["account.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "@pulse//core:enum_macros",
-        "@pulse//core:error",
-        "@pulse//core:result",
-        "@pulse//core:stringify",
+        "@pulse//pulse/core:enum_macros",
+        "@pulse//pulse/core:stringify",
     ],
 )
 
@@ -73,9 +71,9 @@ cc_library(
     deps = [
         ":account",
         ":database",
-        "@pulse//core:error",
-        "@pulse//core:result",
-        "@pulse//core:stringify",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
     ],
 )
 
@@ -88,8 +86,7 @@ cc_test(
         ":database",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
-        "@pulse//core:error",
-        "@pulse//core:result",
-        "@sqlite3",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
     ],
 )

@@ -1,26 +1,37 @@
-#include <memory>
+#include "vigil/handlers/health_handler.h"
+
+#include <optional>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "pulse/core/result.h"
 #include "pulse/http/handler.h"
+#include "pulse/http/method.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
-#include "vigil/handlers/handler_registry.h"
+#include "pulse/http/router.h"
 
 namespace vigil {
 
 namespace {
 
-using ::pulse::http::Handler;
+using ::pulse::http::Method;
 using ::pulse::http::Request;
 using ::pulse::http::Response;
+using ::pulse::http::Router;
+using ::pulse::http::Routes;
+using ::pulse::http::ServerContext;
 using ::testing::Eq;
-using ::testing::NotNull;
 
-TEST(HealthHandlerTest, Test) {
-  std::unique_ptr<Handler> handler = MakeHealthHandler();
-  ASSERT_THAT(handler, NotNull());
-  EXPECT_THAT((*handler)(Request{}),
+TEST(HealthHandlerTest, ReturnsOk) {
+  pulse::Result<Router> router =
+      Router::Make<Routes<HealthHandler>>(ServerContext<>{});
+  ASSERT_TRUE(router.ok());
+
+  std::optional<Router::Match> match = router->match(Method::kGet, "/health");
+  ASSERT_TRUE(match.has_value());
+
+  EXPECT_THAT((*match->handler)(Request{}),
               Eq(Response{.content_type = "application/json",
                           .status = 200,
                           .body = R"({"status": "ok"})"}));
