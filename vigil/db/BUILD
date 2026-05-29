@@ -90,3 +90,11 @@ cc_test(
         "@pulse//pulse/core:result",
     ],
 )
+
+# TODO(move to pulse)
+cc_library(
+    name = "time",
+    hdrs = ["time.h"],
+    visibility = ["//visibility:public"],
+    deps = ["@pulse//pulse/core:stringify"],
+)
