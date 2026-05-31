@@ -25,7 +25,7 @@ pulse::http::Response GetAccountHandler::operator()(
   pulse::Log() << "GetAccount: handling request (name='" << name->second
                << "')";
 
-  pulse::Result<Account> account = dao.GetAccount(name->second);
+  pulse::Result<Account> account = dao_.GetAccount(name->second);
   if (!account.ok()) {
     pulse::Log() << "GetAccount: lookup failed: " << account.error().message;
     return pulse::http::Response{.content_type = "application/json",

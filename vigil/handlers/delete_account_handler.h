@@ -13,13 +13,13 @@ class DeleteAccountHandler final : public pulse::http::Handler {
   PULSE_HTTP_ROUTE("/accounts/{name}", pulse::http::Method::kDelete);
   using Dependencies = pulse::http::Dependencies<AccountsDao*>;
 
-  explicit DeleteAccountHandler(AccountsDao* dao) : dao(*dao) {}
+  explicit DeleteAccountHandler(AccountsDao* dao) : dao_(*dao) {}
 
   pulse::http::Response operator()(
       const pulse::http::Request& request) const override;
 
  private:
-  AccountsDao& dao;
+  AccountsDao& dao_;
 };
 
 }  // namespace vigil

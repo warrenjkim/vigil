@@ -39,7 +39,7 @@ pulse::http::Response CreateAccountHandler::operator()(
                << "', type='" << type->second << "')";
 
   if (pulse::Result<void> account =
-          dao.CreateAccount(name->second, account_type);
+          dao_.CreateAccount(name->second, account_type);
       !account.ok()) {
     pulse::Log() << "CreateAccount: create failed: " << account.error().message;
     return pulse::http::Response{.content_type = "application/json",

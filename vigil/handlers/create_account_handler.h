@@ -13,13 +13,13 @@ class CreateAccountHandler final : public pulse::http::Handler {
   PULSE_HTTP_ROUTE("/accounts", pulse::http::Method::kPost);
   using Dependencies = pulse::http::Dependencies<AccountsDao*>;
 
-  explicit CreateAccountHandler(AccountsDao* dao) : dao(*dao) {}
+  explicit CreateAccountHandler(AccountsDao* dao) : dao_(*dao) {}
 
   pulse::http::Response operator()(
       const pulse::http::Request& request) const override;
 
  private:
-  AccountsDao& dao;
+  AccountsDao& dao_;
 };
 
 }  // namespace vigil

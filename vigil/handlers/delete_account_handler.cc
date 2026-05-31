@@ -21,7 +21,7 @@ pulse::http::Response DeleteAccountHandler::operator()(
   pulse::Log() << "DeleteAccount: handling request (name='" << name->second
                << "')";
 
-  if (pulse::Result<void> account = dao.DeleteAccount(name->second);
+  if (pulse::Result<void> account = dao_.DeleteAccount(name->second);
       !account.ok()) {
     pulse::Log() << "DeleteAccount: delete failed: " << account.error().message;
     return pulse::http::Response{.content_type = "application/json",
