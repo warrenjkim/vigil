@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <string>
 
@@ -17,6 +18,20 @@ template <>
 struct ColumnExtractor<int> {
   static int Get(sqlite3_stmt* stmt, size_t col) {
     return sqlite3_column_int(stmt, static_cast<int>(col));
+  }
+};
+
+template <>
+struct ColumnExtractor<int64_t> {
+  static int64_t Get(sqlite3_stmt* stmt, size_t col) {
+    return sqlite3_column_int64(stmt, static_cast<int>(col));
+  }
+};
+
+template <>
+struct ColumnExtractor<double> {
+  static double Get(sqlite3_stmt* stmt, size_t col) {
+    return sqlite3_column_double(stmt, static_cast<int>(col));
   }
 };
 

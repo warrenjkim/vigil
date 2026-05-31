@@ -3,6 +3,7 @@
 #include <sqlite3.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -26,6 +27,20 @@ template <>
 struct ParameterBinder<int> {
   static int Bind(sqlite3_stmt* stmt, int i, int value) {
     return sqlite3_bind_int(stmt, i, value);
+  }
+};
+
+template <>
+struct ParameterBinder<int64_t> {
+  static int Bind(sqlite3_stmt* stmt, int i, int64_t value) {
+    return sqlite3_bind_int64(stmt, i, value);
+  }
+};
+
+template <>
+struct ParameterBinder<double> {
+  static int Bind(sqlite3_stmt* stmt, int i, double value) {
+    return sqlite3_bind_double(stmt, i, value);
   }
 };
 

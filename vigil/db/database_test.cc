@@ -167,6 +167,45 @@ TEST_F(DatabaseTest, TextColumnNull) {
   EXPECT_FALSE(value.has_value());
 }
 
+TEST_F(DatabaseTest, DoubleColumnNonNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value REAL);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1}, {":value", 3.14}})
+          .ok());
+
+  double value = -1.0;
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{}, [&value](double v) { value = v; })
+                  .ok());
+
+  EXPECT_THAT(value, Eq(3.14));
+}
+
+TEST_F(DatabaseTest, DoubleColumnNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value REAL);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1}, {":value", std::optional<double>{}}})
+          .ok());
+
+  std::optional<double> value = -1.0;
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{},
+                         [&value](std::optional<double> v) { value = v; })
+                  .ok());
+
+  EXPECT_FALSE(value.has_value());
+}
+
 TEST_F(DatabaseTest, InitializeAppliesSchema) {
   Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
   ASSERT_TRUE(db.Initialize().ok());
