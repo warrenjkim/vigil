@@ -94,46 +94,46 @@ cc_library(
     deps = ["@pulse//pulse/core:stringify"],
 )
 
-# cc_library(
-#     name = "transaction",
-#     hdrs = ["transaction.h"],
-#     visibility = ["//visibility:public"],
-#     deps = [
-#         ":time",
-#         "@pulse//pulse/core:enum_macros",
-#         "@pulse//pulse/core:stringify",
-#         "@pulse//pulse/strings:cat",
-#     ],
-# )
-#
-# cc_library(
-#     name = "transactions_dao",
-#     srcs = ["transactions_dao.cc"],
-#     hdrs = ["transactions_dao.h"],
-#     visibility = ["//visibility:public"],
-#     deps = [
-#         ":database",
-#         ":time",
-#         ":transaction",
-#         "@pulse//pulse/core:error",
-#         "@pulse//pulse/core:result",
-#         "@pulse//pulse/core:stringify",
-#     ],
-# )
-#
-# cc_test(
-#     name = "transactions_dao_test",
-#     srcs = ["transactions_dao_test.cc"],
-#     deps = [
-#         ":account",
-#         ":accounts_dao",
-#         ":database",
-#         ":time",
-#         ":transaction",
-#         ":transactions_dao",
-#         "@googletest//:gtest",
-#         "@googletest//:gtest_main",
-#         "@pulse//pulse/core:error",
-#         "@pulse//pulse/core:result",
-#     ],
-# )
+cc_library(
+    name = "transaction",
+    hdrs = ["transaction.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":time",
+        "@pulse//pulse/core:enum_macros",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
+    name = "transactions_dao",
+    srcs = ["transactions_dao.cc"],
+    hdrs = ["transactions_dao.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":database",
+        ":time",
+        ":transaction",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+    ],
+)
+
+cc_test(
+    name = "transactions_dao_test",
+    srcs = ["transactions_dao_test.cc"],
+    deps = [
+        ":account",
+        ":accounts_dao",
+        ":database",
+        ":time",
+        ":transaction",
+        ":transactions_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+    ],
+)
