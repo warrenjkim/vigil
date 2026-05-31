@@ -12,7 +12,9 @@
 #include "pulse/core/error.h"
 #include "pulse/core/result.h"
 #include "sqlite3.h"
-#include "vigil/db/sqlite_traits.h"
+#include "vigil/db/sqlite_traits/column_extractor.h"
+#include "vigil/db/sqlite_traits/parameter_binder.h"
+#include "vigil/db/sqlite_traits/types.h"
 
 namespace vigil {
 
