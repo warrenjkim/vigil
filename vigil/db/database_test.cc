@@ -1,5 +1,6 @@
 #include "vigil/db/database.h"
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -84,6 +85,86 @@ TEST_F(DatabaseTest, ExecuteCreateAndQuery) {
   EXPECT_THAT(rows[0].second, StrEq("test"));
   EXPECT_THAT(rows[1].first, Eq(2));
   EXPECT_THAT(rows[1].second, StrEq("test_2"));
+}
+
+TEST_F(DatabaseTest, IntegerColumnNonNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value INTEGER);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1}, {":value", 42}})
+          .ok());
+
+  int value = -1;
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{}, [&value](int v) { value = v; })
+                  .ok());
+
+  EXPECT_THAT(value, Eq(42));
+}
+
+TEST_F(DatabaseTest, IntegerColumnNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value INTEGER);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1}, {":value", std::optional<int>{}}})
+          .ok());
+
+  std::optional<int> value = -1;
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{},
+                         [&value](std::optional<int> v) { value = v; })
+                  .ok());
+
+  EXPECT_FALSE(value.has_value());
+}
+
+TEST_F(DatabaseTest, TextColumnNonNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value TEXT);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1}, {":value", std::string("hello")}})
+          .ok());
+
+  std::string value;
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{},
+                         [&value](std::string v) { value = std::move(v); })
+                  .ok());
+
+  EXPECT_THAT(value, StrEq("hello"));
+}
+
+TEST_F(DatabaseTest, TextColumnNull) {
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value TEXT);)sql")
+          .ok());
+  ASSERT_TRUE(
+      db.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (:id, :value);)sql",
+            /*parameters=*/{{":id", 1},
+                            {":value", std::optional<std::string>{}}})
+          .ok());
+
+  std::optional<std::string> value = "sentinel";
+  ASSERT_TRUE(db.Execute(R"sql(SELECT Value FROM TestTable WHERE Id = 1;)sql",
+                         /*parameters=*/{},
+                         [&value](std::optional<std::string> v) { value = v; })
+                  .ok());
+
+  EXPECT_FALSE(value.has_value());
 }
 
 TEST_F(DatabaseTest, InitializeAppliesSchema) {
