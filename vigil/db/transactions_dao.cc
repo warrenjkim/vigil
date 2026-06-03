@@ -19,7 +19,6 @@ TransactionsDao::TransactionsDao(Database db) : db_(db) {}
 
 pulse::Result<void> TransactionsDao::CreateTransaction(
     std::string_view account_name, Transaction::Type type, double amount,
-    std::optional<int> transfer_id,
     std::optional<std::string_view> description) {
   return db_.Execute(
       R"sql(
@@ -27,7 +26,6 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
           AccountId,
           Type,
           Amount,
-          TransferId,
           Description,
           Timestamp
         )
@@ -35,7 +33,6 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
           (SELECT Id FROM Accounts WHERE Name = :account_name),
           :type,
           :amount,
-          :transfer_id,
           :description,
           :timestamp
         )
@@ -43,7 +40,6 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
       /*parameters=*/{{":account_name", account_name},
                       {":type", pulse::to_string(type)},
                       {":amount", amount},
-                      {":transfer_id", transfer_id},
                       {":description", description},
                       {":timestamp", Time::Now().ToUnixSeconds()}});
 }

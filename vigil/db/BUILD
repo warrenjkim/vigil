@@ -25,7 +25,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":schema_sql",
-        ":time",
         "//vigil/db/sqlite_traits:column_extractor",
         "//vigil/db/sqlite_traits:parameter_binder",
         "//vigil/db/sqlite_traits:types",
@@ -115,7 +114,6 @@ cc_library(
         ":database",
         ":time",
         ":transaction",
-        "@pulse//pulse/core:error",
         "@pulse//pulse/core:result",
         "@pulse//pulse/core:stringify",
     ],
@@ -128,7 +126,6 @@ cc_test(
         ":account",
         ":accounts_dao",
         ":database",
-        ":time",
         ":transaction",
         ":transactions_dao",
         "@googletest//:gtest",

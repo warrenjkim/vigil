@@ -12,8 +12,7 @@ namespace vigil {
 
 #define TRANSACTION_TYPE_TABLE(X) \
   X(kDeposit, "DEPOSIT")          \
-  X(kWithdrawal, "WITHDRAWAL")    \
-  X(kTransfer, "TRANSFER")
+  X(kWithdrawal, "WITHDRAWAL")
 
 struct Transaction {
   PULSE_ENUM(Type, TRANSACTION_TYPE_TABLE);
@@ -40,10 +39,9 @@ struct pulse::Stringify<vigil::Transaction> {
   static std::string to_string(const vigil::Transaction& t) {
     return pulse::strings::cat(
         "Transaction{.id=", pulse::to_string(t.id),
-        ",.account_id=", pulse::to_string(t.account_name),
+        ",.account_name=", pulse::to_string(t.account_name),
         ",.type=", pulse::to_string(t.type),
-        ",.amount=", pulse::to_string(t.amount),
-        ",.transfer_id=", ",.description=",
+        ",.amount=", pulse::to_string(t.amount), ",.description=",
         t.description.has_value() ? pulse::to_string(*t.description)
                                   : "std::nullopt",
         ",.timestamp=", pulse::to_string(t.timestamp), "}");

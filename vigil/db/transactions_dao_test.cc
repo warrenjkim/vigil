@@ -48,7 +48,6 @@ TEST_F(TransactionsDaoTest, CreateAndList) {
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
                                       Transaction::Type::kDeposit,
                                       /*amount=*/100.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/std::nullopt)
                   .ok());
 
@@ -66,7 +65,6 @@ TEST_F(TransactionsDaoTest, CreateWithDescription) {
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
                                       Transaction::Type::kDeposit,
                                       /*amount=*/100.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/"initial deposit")
                   .ok());
 
@@ -89,13 +87,11 @@ TEST_F(TransactionsDaoTest, ListMultipleTransactions) {
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
                                       Transaction::Type::kDeposit,
                                       /*amount=*/100.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/std::nullopt)
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
                                       Transaction::Type::kWithdrawal,
                                       /*amount=*/50.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/std::nullopt)
                   .ok());
 
@@ -112,13 +108,11 @@ TEST_F(TransactionsDaoTest, ListTransactionsIsolatedByAccount) {
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
                                       Transaction::Type::kDeposit,
                                       /*amount=*/100.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/std::nullopt)
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"savings",
                                       Transaction::Type::kDeposit,
                                       /*amount=*/200.0,
-                                      /*transfer_id=*/std::nullopt,
                                       /*description=*/std::nullopt)
                   .ok());
 
@@ -133,7 +127,6 @@ TEST_F(TransactionsDaoTest, CreateForNonexistentAccount) {
   pulse::Result<void> result = dao_->CreateTransaction(
       /*account_name=*/"nonexistent", Transaction::Type::kDeposit,
       /*amount=*/100.0,
-      /*transfer_id=*/std::nullopt,
       /*description=*/std::nullopt);
   EXPECT_FALSE(result.ok());
 }
