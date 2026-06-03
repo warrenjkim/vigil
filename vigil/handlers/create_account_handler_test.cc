@@ -55,19 +55,17 @@ class CreateAccountHandlerTest : public ::testing::Test {
 TEST_F(CreateAccountHandlerTest, CreateAccount) {
   EXPECT_THAT(
       RunMethod(Request{
-          .query_params = {{"name", "checking"},
-                           {"type",
-                            pulse::to_string(Account::Type::kChecking)}}}),
+          .query = {{"name", "checking"},
+                    {"type", pulse::to_string(Account::Type::kChecking)}}}),
       Eq(Response{
           .content_type = "text/plain", .status = 201, .body = "Created"}));
 }
 
 TEST_F(CreateAccountHandlerTest, PersistsAccount) {
   ASSERT_THAT(
-      RunMethod(
-          Request{.query_params = {{"name", "checking"},
-                                   {"type", pulse::to_string(
-                                                Account::Type::kChecking)}}})
+      RunMethod(Request{.query = {{"name", "checking"},
+                                  {"type", pulse::to_string(
+                                               Account::Type::kChecking)}}})
           .status,
       Eq(201));
   pulse::Result<Account> account = dao_->GetAccount("checking");
@@ -79,33 +77,31 @@ TEST_F(CreateAccountHandlerTest, PersistsAccount) {
 
 TEST_F(CreateAccountHandlerTest, MissingNameParam) {
   EXPECT_THAT(
-      RunMethod(
-          Request{.query_params = {{"type", pulse::to_string(
-                                                Account::Type::kChecking)}}})
+      RunMethod(Request{.query = {{"type", pulse::to_string(
+                                               Account::Type::kChecking)}}})
           .status,
       Eq(400));
 }
 
 TEST_F(CreateAccountHandlerTest, MissingTypeParam) {
-  EXPECT_THAT(RunMethod(Request{.query_params = {{"name", "checking"}}}).status,
+  EXPECT_THAT(RunMethod(Request{.query = {{"name", "checking"}}}).status,
               Eq(400));
 }
 
 TEST_F(CreateAccountHandlerTest, UnrecognizedType) {
-  EXPECT_THAT(RunMethod(Request{.query_params = {{"name", "checking"},
-                                                 {"type", "bad_type"}}})
-                  .status,
-              Eq(400));
+  EXPECT_THAT(
+      RunMethod(Request{.query = {{"name", "checking"}, {"type", "bad_type"}}})
+          .status,
+      Eq(400));
 }
 
 TEST_F(CreateAccountHandlerTest, DuplicateCreate) {
   pulse::die_if_error(
       dao_->CreateAccount("checking", Account::Type::kChecking));
   EXPECT_THAT(
-      RunMethod(
-          Request{.query_params = {{"name", "checking"},
-                                   {"type", pulse::to_string(
-                                                Account::Type::kChecking)}}})
+      RunMethod(Request{.query = {{"name", "checking"},
+                                  {"type", pulse::to_string(
+                                               Account::Type::kChecking)}}})
           .status,
       Eq(500));
 }

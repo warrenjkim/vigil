@@ -14,18 +14,17 @@ namespace vigil {
 
 pulse::http::Response GetAccountHandler::operator()(
     const pulse::http::Request& request) const {
-  auto name = request.path_params.find("name");
-  if (name == request.path_params.end()) {
-    pulse::Log() << "GetAccount: missing parameter 'name'";
+  auto name = request.path.get<std::string>("name");
+  if (!name.ok()) {
+    pulse::Log() << "GetAccount: getting 'name': " << name.error().message;
     return pulse::http::Response{.content_type = "application/json",
                                  .status = 400,
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  pulse::Log() << "GetAccount: handling request (name='" << name->second
-               << "')";
+  pulse::Log() << "GetAccount: handling request (name='" << *name << "')";
 
-  pulse::Result<Account> account = dao_.GetAccount(name->second);
+  pulse::Result<Account> account = dao_.GetAccount(*name);
   if (!account.ok()) {
     pulse::Log() << "GetAccount: lookup failed: " << account.error().message;
     return pulse::http::Response{.content_type = "application/json",

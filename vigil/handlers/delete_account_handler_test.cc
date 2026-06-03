@@ -57,22 +57,21 @@ TEST_F(DeleteAccountHandlerTest, MissingNameParam) {
 TEST_F(DeleteAccountHandlerTest, DeleteAccount) {
   pulse::die_if_error(
       dao_->CreateAccount("checking", Account::Type::kChecking));
-  EXPECT_THAT(RunMethod(Request{.path_params = {{"name", "checking"}}}).status,
+  EXPECT_THAT(RunMethod(Request{.path = {{"name", "checking"}}}).status,
               Eq(204));
 }
 
 TEST_F(DeleteAccountHandlerTest, PersistsDeletion) {
   pulse::die_if_error(
       dao_->CreateAccount("checking", Account::Type::kChecking));
-  ASSERT_THAT(RunMethod(Request{.path_params = {{"name", "checking"}}}).status,
+  ASSERT_THAT(RunMethod(Request{.path = {{"name", "checking"}}}).status,
               Eq(204));
   EXPECT_FALSE(dao_->GetAccount("checking").ok());
 }
 
 TEST_F(DeleteAccountHandlerTest, DeleteNonexistentAccount) {
-  EXPECT_THAT(
-      RunMethod(Request{.path_params = {{"name", "nonexistent"}}}).status,
-      Eq(204));
+  EXPECT_THAT(RunMethod(Request{.path = {{"name", "nonexistent"}}}).status,
+              Eq(204));
 }
 
 }  // namespace

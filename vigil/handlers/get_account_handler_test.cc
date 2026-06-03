@@ -50,16 +50,15 @@ class GetAccountHandlerTest : public ::testing::Test {
 };
 
 TEST_F(GetAccountHandlerTest, NotFound) {
-  EXPECT_THAT(
-      RunMethod(Request{.path_params = {{"name", "nonexistent"}}}).status,
-      Eq(404));
+  EXPECT_THAT(RunMethod(Request{.path = {{"name", "nonexistent"}}}).status,
+              Eq(404));
 }
 
 TEST_F(GetAccountHandlerTest, GetAccount) {
   pulse::die_if_error(
       dao_->CreateAccount("checking", Account::Type::kChecking));
   EXPECT_THAT(
-      RunMethod(Request{.path_params = {{"name", "checking"}}}),
+      RunMethod(Request{.path = {{"name", "checking"}}}),
       Eq(Response{
           .content_type = "application/json",
           .status = 200,
