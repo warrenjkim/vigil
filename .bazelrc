@@ -3,6 +3,9 @@ common --color=yes
 common --curses=yes
 common --check_direct_dependencies=warning
 
+build:macos --linkopt=-mmacosx-version-min=26.0
+build:macos --cxxopt=-mmacosx-version-min=26.0
+
 build:base --features=layering_check
 build:base --cxxopt=-std=gnu++23
 build:base --cxxopt=-Wall
@@ -29,7 +32,9 @@ build:strict --cxxopt=-DADDRESS_SANITIZER
 build:strict --cxxopt=-DUNDEFINED_BEHAVIOR_SANITIZER
 build:strict --cxxopt=-fsanitize=address,undefined
 build:strict --linkopt=-fsanitize=address,undefined
+
 build --config=base
+build --enable_platform_specific_config
 
 test --color=yes
 test --test_output=all
