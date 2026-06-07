@@ -52,6 +52,9 @@ cc_library(
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
+        "@pulse//pulse/json:bind",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
     ],
 )
 
@@ -72,6 +75,9 @@ cc_test(
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/http:router",
+        "@pulse//pulse/json:bind",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
     ],
 )
 
@@ -184,5 +190,8 @@ cc_test(
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/http:router",
+        "@pulse//pulse/json:bind",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
     ],
 )
