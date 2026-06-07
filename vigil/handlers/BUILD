@@ -159,6 +159,9 @@ cc_library(
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
+        "@pulse//pulse/json:bind",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
     ],
 )
 

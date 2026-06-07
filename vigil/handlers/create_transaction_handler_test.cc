@@ -9,7 +9,6 @@
 #include "gtest/gtest.h"
 #include "pulse/core/result.h"
 #include "pulse/core/result_or_die.h"
-#include "pulse/core/stringify.h"
 #include "pulse/http/handler.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
@@ -65,10 +64,8 @@ class CreateTransactionHandlerTest : public ::testing::Test {
 
 TEST_F(CreateTransactionHandlerTest, CreateTransaction) {
   EXPECT_THAT(
-      RunMethod(Request{
-          .path = {{"name", "checking"}},
-          .query = {{"type", pulse::to_string(Transaction::Type::kDeposit)},
-                    {"amount", "100.00"}}}),
+      RunMethod(Request{.path = {{"name", "checking"}},
+                        .body = R"({"type": "DEPOSIT", "amount": 100.0})"}),
       Eq(Response{
           .content_type = "text/plain", .status = 201, .body = "Created"}));
 }
@@ -76,9 +73,7 @@ TEST_F(CreateTransactionHandlerTest, CreateTransaction) {
 TEST_F(CreateTransactionHandlerTest, PersistsTransaction) {
   ASSERT_THAT(
       RunMethod(Request{.path = {{"name", "checking"}},
-                        .query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)},
-                                  {"amount", "100.00"}}})
+                        .body = R"({"type": "DEPOSIT", "amount": 100.0})"})
           .status,
       Eq(201));
 
@@ -88,60 +83,55 @@ TEST_F(CreateTransactionHandlerTest, PersistsTransaction) {
   ASSERT_THAT(*transactions, SizeIs(1));
   EXPECT_THAT((*transactions)[0].account_name, Eq("checking"));
   EXPECT_THAT((*transactions)[0].type, Eq(Transaction::Type::kDeposit));
-  EXPECT_THAT((*transactions)[0].amount, Eq(100.00));
+  EXPECT_THAT((*transactions)[0].amount, Eq(100.0));
   EXPECT_THAT((*transactions)[0].description, Eq(std::nullopt));
 }
 
 TEST_F(CreateTransactionHandlerTest, WithDescription) {
   EXPECT_THAT(
-      RunMethod(Request{.path = {{"name", "checking"}},
-                        .query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)},
-                                  {"amount", "100.00"},
-                                  {"description", "paycheck"}}})
+      RunMethod(
+          Request{
+              .path = {{"name", "checking"}},
+              .body =
+                  R"({"type": "DEPOSIT", "amount": 100.0, "description": "paycheck"})"})
           .status,
       Eq(201));
 }
 
 TEST_F(CreateTransactionHandlerTest, MissingAccountName) {
   EXPECT_THAT(
-      RunMethod(Request{.query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)},
-                                  {"amount", "100.00"}}})
+      RunMethod(Request{.body = R"({"type": "DEPOSIT", "amount": 100.0})"})
           .status,
       Eq(400));
 }
 
 TEST_F(CreateTransactionHandlerTest, MissingType) {
   EXPECT_THAT(RunMethod(Request{.path = {{"name", "checking"}},
-                                .query = {{"amount", "100.00"}}})
+                                .body = R"({"amount": 100.0})"})
                   .status,
               Eq(400));
 }
 
 TEST_F(CreateTransactionHandlerTest, MissingAmount) {
-  EXPECT_THAT(
-      RunMethod(Request{.path = {{"name", "checking"}},
-                        .query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)}}})
-          .status,
-      Eq(400));
+  EXPECT_THAT(RunMethod(Request{.path = {{"name", "checking"}},
+                                .body = R"({"type": "DEPOSIT"})"})
+                  .status,
+              Eq(400));
 }
 
 TEST_F(CreateTransactionHandlerTest, UnrecognizedType) {
   EXPECT_THAT(
       RunMethod(Request{.path = {{"name", "checking"}},
-                        .query = {{"type", "bad_type"}, {"amount", "100.00"}}})
+                        .body = R"({"type": "bad_type", "amount": 100.0})"})
           .status,
       Eq(400));
 }
 
 TEST_F(CreateTransactionHandlerTest, InvalidAmount) {
   EXPECT_THAT(
-      RunMethod(Request{.path = {{"name", "checking"}},
-                        .query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)},
-                                  {"amount", "not_a_number"}}})
+      RunMethod(
+          Request{.path = {{"name", "checking"}},
+                  .body = R"({"type": "DEPOSIT", "amount": "not_a_number"})"})
           .status,
       Eq(400));
 }
@@ -149,9 +139,7 @@ TEST_F(CreateTransactionHandlerTest, InvalidAmount) {
 TEST_F(CreateTransactionHandlerTest, NonexistentAccount) {
   EXPECT_THAT(
       RunMethod(Request{.path = {{"name", "nonexistent"}},
-                        .query = {{"type", pulse::to_string(
-                                               Transaction::Type::kDeposit)},
-                                  {"amount", "100.00"}}})
+                        .body = R"({"type": "DEPOSIT", "amount": 100.0})"})
           .status,
       Eq(500));
 }
