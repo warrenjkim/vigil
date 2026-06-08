@@ -5,10 +5,13 @@ cc_binary(
     deps = [
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
+        "//vigil/db:transactions_dao",
         "//vigil/handlers:create_account_handler",
+        "//vigil/handlers:create_transaction_handler",
         "//vigil/handlers:delete_account_handler",
         "//vigil/handlers:get_account_handler",
         "//vigil/handlers:health_handler",
+        "//vigil/handlers:list_transactions_handler",
         "@pulse//pulse/core:result_or_die",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:method",
