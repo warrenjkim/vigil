@@ -7,7 +7,7 @@ module(
 bazel_dep(name = "pulse", version = "1.0.0")
 git_override(
     module_name = "pulse",
-    commit = "e77f0ac4f9e35265b1caa23c445225837395c128",
+    commit = "5531f2c62fe46e16cd83eb49a264d0b8b8f743ca",
     remote = "https://github.com/warrenjkim/pulse.git",
 )
 
