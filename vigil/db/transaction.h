@@ -38,12 +38,9 @@ template <>
 struct pulse::Stringify<vigil::Transaction> {
   static std::string to_string(const vigil::Transaction& t) {
     return pulse::strings::cat(
-        "Transaction{.id=", pulse::to_string(t.id),
-        ",.account_name=", pulse::to_string(t.account_name),
-        ",.type=", pulse::to_string(t.type),
-        ",.amount=", pulse::to_string(t.amount), ",.description=",
-        t.description.has_value() ? pulse::to_string(*t.description)
-                                  : "std::nullopt",
-        ",.timestamp=", pulse::to_string(t.timestamp), "}");
+        "Transaction{.id=", t.id, ",.account_name=", t.account_name,
+        ",.type=", t.type, ",.amount=", t.amount, ",.description=",
+        t.description.has_value() ? *t.description : "std::nullopt",
+        ",.timestamp=", t.timestamp, "}");
   }
 };
