@@ -12,6 +12,10 @@
 #include "vigil/handlers/get_account_handler.h"
 #include "vigil/handlers/health_handler.h"
 
+using AccountHandlers =
+    pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
+                        vigil::DeleteAccountHandler>;
+
 int main() {
   vigil::Database db = pulse::unwrap_or_die(vigil::Database::Open("vigil.db"));
   pulse::die_if_error(db.Initialize());
@@ -22,9 +26,8 @@ int main() {
   ctx.set(&accounts_dao);
 
   pulse::http::Router router = pulse::unwrap_or_die(
-      pulse::http::Router::Make<pulse::http::Routes<
-          vigil::HealthHandler, vigil::CreateAccountHandler,
-          vigil::GetAccountHandler, vigil::DeleteAccountHandler>>(ctx));
+      pulse::http::Router::Make<
+          pulse::http::Routes<vigil::HealthHandler, AccountHandlers>>(ctx));
 
   pulse::http::Server server(std::move(router), {.port = 8080, .threads = 1});
 
