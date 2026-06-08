@@ -70,7 +70,7 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
                           int64_t timestamp) {
             transactions.push_back(
                 Transaction{.id = id,
-                            .account_name = account_name,
+                            .account_name = std::move(account_name),
                             .type = to_transfer_type(type),
                             .amount = amount,
                             .description = std::move(description),
