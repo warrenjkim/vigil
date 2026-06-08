@@ -195,3 +195,42 @@ cc_test(
         "@pulse//pulse/json:value",
     ],
 )
+
+cc_library(
+    name = "list_transactions_handler",
+    srcs = ["list_transactions_handler.cc"],
+    hdrs = ["list_transactions_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:transaction",
+        "//vigil/db:transactions_dao",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/json:value",
+    ],
+)
+
+cc_test(
+    name = "list_transactions_handler_test",
+    srcs = ["list_transactions_handler_test.cc"],
+    deps = [
+        ":list_transactions_handler",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "//vigil/db:transaction",
+        "//vigil/db:transactions_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:result_or_die",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
+    ],
+)
