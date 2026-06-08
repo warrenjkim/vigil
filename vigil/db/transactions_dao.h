@@ -19,7 +19,7 @@ class TransactionsDao {
       std::optional<std::string_view> description = std::nullopt);
 
   pulse::Result<std::vector<Transaction>> ListTransactions(
-      std::string_view account_id);
+      std::string_view account_name);
 
  private:
   Database db_;
