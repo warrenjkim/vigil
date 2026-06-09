@@ -134,3 +134,42 @@ cc_test(
         "@pulse//pulse/core:result",
     ],
 )
+
+cc_library(
+    name = "holding",
+    hdrs = ["holding.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
+    name = "holdings_dao",
+    srcs = ["holdings_dao.cc"],
+    hdrs = ["holdings_dao.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":database",
+        ":holding",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+    ],
+)
+
+cc_test(
+    name = "holdings_dao_test",
+    srcs = ["holdings_dao_test.cc"],
+    deps = [
+        ":account",
+        ":accounts_dao",
+        ":database",
+        ":holding",
+        ":holdings_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+    ],
+)
