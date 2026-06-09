@@ -3,6 +3,8 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "pulse/core/error.h"
 #include "pulse/core/result.h"
@@ -39,6 +41,23 @@ pulse::Result<Account> AccountsDao::GetAccount(std::string_view name) {
   }
 
   return *account;
+}
+
+pulse::Result<std::vector<Account>> AccountsDao::ListAccounts() {
+  std::vector<Account> accounts;
+  if (pulse::Result<void> err = db_.Execute(
+          R"sql(SELECT Id, Name, Type FROM Accounts)sql",
+          /*parameters=*/{},
+          [&accounts](int id, std::string name, std::string type) {
+            accounts.push_back(Account{.id = id,
+                                       .name = std::move(name),
+                                       .type = to_account_type(type)});
+          });
+      !err.ok()) {
+    return err.error();
+  }
+
+  return accounts;
 }
 
 pulse::Result<void> AccountsDao::DeleteAccount(std::string_view name) {

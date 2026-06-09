@@ -3,9 +3,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":create_account_handler",
+        ":create_transaction_handler",
         ":delete_account_handler",
         ":get_account_handler",
         ":health_handler",
+        ":list_accounts_handler",
+        ":list_transactions_handler",
     ],
 )
 
@@ -70,14 +73,10 @@ cc_test(
         "@googletest//:gtest_main",
         "@pulse//pulse/core:result",
         "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/core:stringify",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/http:router",
-        "@pulse//pulse/json:bind",
-        "@pulse//pulse/json:parse",
-        "@pulse//pulse/json:value",
     ],
 )
 
@@ -185,14 +184,47 @@ cc_test(
         "@googletest//:gtest_main",
         "@pulse//pulse/core:result",
         "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/core:stringify",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/http:router",
-        "@pulse//pulse/json:bind",
-        "@pulse//pulse/json:parse",
+    ],
+)
+
+cc_library(
+    name = "list_accounts_handler",
+    srcs = ["list_accounts_handler.cc"],
+    hdrs = ["list_accounts_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
         "@pulse//pulse/json:value",
+    ],
+)
+
+cc_test(
+    name = "list_accounts_handler_test",
+    srcs = ["list_accounts_handler_test.cc"],
+    deps = [
+        ":list_accounts_handler",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:result_or_die",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
     ],
 )
 

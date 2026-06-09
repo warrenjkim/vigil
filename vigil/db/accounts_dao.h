@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <vector>
 
 #include "pulse/core/result.h"
 #include "vigil/db/account.h"
@@ -15,6 +16,8 @@ class AccountsDao {
   pulse::Result<void> CreateAccount(std::string_view name, Account::Type type);
 
   pulse::Result<Account> GetAccount(std::string_view name);
+
+  pulse::Result<std::vector<Account>> ListAccounts();
 
   pulse::Result<void> DeleteAccount(std::string_view name);
 
