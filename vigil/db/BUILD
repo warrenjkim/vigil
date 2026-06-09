@@ -173,3 +173,45 @@ cc_test(
         "@pulse//pulse/core:result",
     ],
 )
+
+cc_library(
+    name = "trade",
+    hdrs = ["trade.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":time",
+        "@pulse//pulse/core:enum_macros",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
+    name = "trades_dao",
+    srcs = ["trades_dao.cc"],
+    hdrs = ["trades_dao.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":database",
+        ":time",
+        ":trade",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+    ],
+)
+
+cc_test(
+    name = "trades_dao_test",
+    srcs = ["trades_dao_test.cc"],
+    deps = [
+        ":account",
+        ":accounts_dao",
+        ":database",
+        ":trade",
+        ":trades_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+    ],
+)
