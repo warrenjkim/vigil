@@ -30,6 +30,7 @@ cc_library(
         "//vigil/db/sqlite_traits:types",
         "@pulse//pulse/core:error",
         "@pulse//pulse/core:result",
+        "@pulse//pulse/strings:cat",
         "@sqlite3",
     ],
 )

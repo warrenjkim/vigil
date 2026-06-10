@@ -11,6 +11,7 @@
 
 #include "pulse/core/error.h"
 #include "pulse/core/result.h"
+#include "pulse/strings/cat.h"
 #include "sqlite3.h"
 #include "vigil/db/sqlite_traits/column_extractor.h"
 #include "vigil/db/sqlite_traits/parameter_binder.h"
@@ -75,18 +76,19 @@ pulse::Result<void> Database::Execute(
                                    static_cast<int>(sql.size()), &stmt,
                                    /*pzTail=*/nullptr);
       err != SQLITE_OK) {
-    return pulse::Error{.code = pulse::Error::Code::kInternal,
-                        .message = "sqlite3_prepare_v2 failed: " +
-                                   std::string(sqlite3_errmsg(db_->handle()))};
+    return pulse::Error{
+        .code = pulse::Error::Code::kInternal,
+        .message = pulse::strings::cat("sqlite3_prepare_v2 failed: ",
+                                       sqlite3_errmsg(db_->handle()))};
   }
 
   for (const auto& [key, value] : parameters) {
     int i = sqlite3_bind_parameter_index(stmt, key.c_str());
     if (i == 0) {
       (void)sqlite3_finalize(stmt);
-      return pulse::Error{
-          .code = pulse::Error::Code::kInternal,
-          .message = "no binding found for parameter '" + key + "'"};
+      return pulse::Error{.code = pulse::Error::Code::kInternal,
+                          .message = pulse::strings::cat(
+                              "no binding found for parameter '", key, "'")};
     }
 
     if (int err = std::visit(
@@ -98,9 +100,9 @@ pulse::Result<void> Database::Execute(
         err != SQLITE_OK) {
       std::string msg = sqlite3_errmsg(db_->handle());
       (void)sqlite3_finalize(stmt);
-      return pulse::Error{
-          .code = pulse::Error::Code::kInternal,
-          .message = "failed to bind parameter '" + key + "': " + msg};
+      return pulse::Error{.code = pulse::Error::Code::kInternal,
+                          .message = pulse::strings::cat(
+                              "failed to bind parameter '", key, "': ", msg)};
     }
   }
 
@@ -113,9 +115,10 @@ pulse::Result<void> Database::Execute(
   }
 
   if (int err = sqlite3_finalize(stmt); err != SQLITE_OK) {
-    return pulse::Error{.code = pulse::Error::Code::kInternal,
-                        .message = "sqlite3_finalize failed: " +
-                                   std::string(sqlite3_errmsg(db_->handle()))};
+    return pulse::Error{
+        .code = pulse::Error::Code::kInternal,
+        .message = pulse::strings::cat("sqlite3_finalize failed: ",
+                                       sqlite3_errmsg(db_->handle()))};
   }
 
   return pulse::Result<void>{};
