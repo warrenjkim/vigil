@@ -66,7 +66,6 @@ class Database {
 // Implementation details below;
 
 // TODO(map sqlite error codes to pulse::Error::Codes)
-// TODO(rethink interface)
 template <SqlCallback F>
 pulse::Result<void> Database::Execute(
     std::string_view sql, std::unordered_map<std::string, SqlValue> parameters,
