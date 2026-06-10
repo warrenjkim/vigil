@@ -53,11 +53,8 @@ struct Callback<R (C::*)(Args...) const> {
 template <typename F>
 concept SqlCallback =
     std::is_same_v<typename Callback<F>::ReturnType, void> &&
-    []<size_t... Is>(std::index_sequence<Is...>) {
-      return (true && ... &&
-              SqlExtractable<
-                  std::tuple_element_t<Is, typename Callback<F>::ArgTypes>>);
-    }(std::make_index_sequence<
-        std::tuple_size_v<typename Callback<F>::ArgTypes>>{});
+    []<typename... Args>(std::type_identity<std::tuple<Args...>>) {
+      return (... && SqlExtractable<Args>);
+    }(std::type_identity<typename Callback<F>::ArgTypes>{});
 
 }  // namespace vigil
