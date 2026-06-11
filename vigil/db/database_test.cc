@@ -238,6 +238,108 @@ TEST_F(DatabaseTest, RejectsUnknownVersion) {
   EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kInternal));
 }
 
+class WrapInTransactionTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
+    ASSERT_TRUE(db_.Execute(R"sql(
+        CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value TEXT NOT NULL);
+    )sql")
+                    .ok());
+  }
+
+  Database db_;
+};
+
+TEST_F(WrapInTransactionTest, CommitsOnSuccess) {
+  pulse::Result<void> result =
+      WrapInTransaction(&db_, [this]() -> pulse::Result<void> {
+        return db_.Execute(
+            R"sql(INSERT INTO TestTable (Id, Value) VALUES (1, 'hello');)sql");
+      });
+
+  ASSERT_TRUE(result.ok());
+
+  int count = 0;
+  ASSERT_TRUE(db_.Execute("SELECT COUNT(*) FROM TestTable;", {},
+                          [&count](int c) { count = c; })
+                  .ok());
+  EXPECT_THAT(count, Eq(1));
+}
+
+TEST_F(WrapInTransactionTest, RollsBackOnFailure) {
+  pulse::Result<void> result =
+      WrapInTransaction(&db_, [this]() -> pulse::Result<void> {
+        if (pulse::Result<void> err = db_.Execute(
+                R"sql(INSERT INTO TestTable (Id, Value) VALUES (1, 'hello');)sql");
+            !err.ok()) {
+          return err;
+        }
+
+        return pulse::Error{.code = pulse::Error::Code::kInternal,
+                            .message = "forced failure"};
+      });
+
+  EXPECT_FALSE(result.ok());
+  EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kInternal));
+
+  int count = 0;
+  ASSERT_TRUE(db_.Execute("SELECT COUNT(*) FROM TestTable;", {},
+                          [&count](int c) { count = c; })
+                  .ok());
+  EXPECT_THAT(count, Eq(0));
+}
+
+TEST_F(WrapInTransactionTest, MultipleWritesAtomic) {
+  pulse::Result<void> result =
+      WrapInTransaction(&db_, [this]() -> pulse::Result<void> {
+        if (pulse::Result<void> err = db_.Execute(
+                R"sql(INSERT INTO TestTable (Id, Value) VALUES (1, 'hello');)sql");
+            !err.ok()) {
+          return err;
+        }
+
+        if (pulse::Result<void> err = db_.Execute(
+                R"sql(INSERT INTO TestTable (Id, Value) VALUES (2, 'world');)sql");
+            !err.ok()) {
+          return err;
+        }
+
+        return pulse::Result<void>{};
+      });
+
+  ASSERT_TRUE(result.ok());
+
+  int count = 0;
+  ASSERT_TRUE(db_.Execute("SELECT COUNT(*) FROM TestTable;", {},
+                          [&count](int c) { count = c; })
+                  .ok());
+  EXPECT_THAT(count, Eq(2));
+}
+
+TEST_F(WrapInTransactionTest, MultipleWritesRollbackOnFailure) {
+  pulse::Result<void> result =
+      WrapInTransaction(&db_, [this]() -> pulse::Result<void> {
+        if (pulse::Result<void> err = db_.Execute(
+                R"sql(INSERT INTO TestTable (Id, Value) VALUES (1, 'hello');)sql");
+            !err.ok()) {
+          return err;
+        }
+
+        return pulse::Error{.code = pulse::Error::Code::kInternal,
+                            .message = "forced failure"};
+      });
+
+  EXPECT_FALSE(result.ok());
+  EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kInternal));
+
+  int count = 0;
+  ASSERT_TRUE(db_.Execute("SELECT COUNT(*) FROM TestTable;", {},
+                          [&count](int c) { count = c; })
+                  .ok());
+  EXPECT_THAT(count, Eq(0));
+}
+
 }  // namespace
 
 }  // namespace vigil

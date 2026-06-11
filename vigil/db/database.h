@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -18,6 +19,11 @@
 #include "vigil/db/sqlite_traits/types.h"
 
 namespace vigil {
+
+template <typename F>
+concept WorkCallback = requires(F f) {
+  { f() } -> std::same_as<pulse::Result<void>>;
+};
 
 class Database {
  public:
@@ -63,6 +69,9 @@ class Database {
 
   std::shared_ptr<Impl> db_;
 };
+
+template <WorkCallback F>
+pulse::Result<void> WrapInTransaction(Database* db, F&& work);
 
 // Implementation details below;
 
@@ -119,6 +128,25 @@ pulse::Result<void> Database::Execute(
         .code = pulse::Error::Code::kInternal,
         .message = pulse::strings::cat("sqlite3_finalize failed: ",
                                        sqlite3_errmsg(db_->handle()))};
+  }
+
+  return pulse::Result<void>{};
+}
+
+template <WorkCallback F>
+pulse::Result<void> WrapInTransaction(Database* db, F&& work) {
+  if (pulse::Result<void> err = db->Execute("BEGIN;"); !err.ok()) {
+    return err;
+  }
+
+  if (pulse::Result<void> err = work(); !err.ok()) {
+    (void)db->Execute("ROLLBACK;");
+    return err;
+  }
+
+  if (pulse::Result<void> err = db->Execute("COMMIT;"); !err.ok()) {
+    (void)db->Execute("ROLLBACK;");
+    return err;
   }
 
   return pulse::Result<void>{};
