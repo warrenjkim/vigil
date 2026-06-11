@@ -26,6 +26,8 @@ concept WorkCallback = requires(F f) {
 };
 
 class Database {
+  struct NoOp;  // intentionally forward declare for `Execute`
+
  public:
   static pulse::Result<Database> Open(std::string_view path);
 
@@ -42,13 +44,17 @@ class Database {
 
   pulse::Result<void> Initialize();
 
-  template <SqlCallback F = decltype([]() {})>
+  template <SqlCallback F = NoOp>
   pulse::Result<void> Execute(
       std::string_view sql,
       std::unordered_map<std::string, SqlValue> parameters = {},
       F&& callback = {});
 
  private:
+  struct NoOp {
+    constexpr void operator()() const {}
+  };
+
   class Impl {
    public:
     explicit Impl(sqlite3* db) : db_(db) {}
