@@ -3,11 +3,15 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":create_account_handler",
+        ":create_trade_handler",
         ":create_transaction_handler",
         ":delete_account_handler",
         ":get_account_handler",
+        ":get_holding_handler",
         ":health_handler",
         ":list_accounts_handler",
+        ":list_holdings_handler",
+        ":list_trades_handler",
         ":list_transactions_handler",
     ],
 )
