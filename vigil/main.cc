@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <cstdlib>
 
 #include "pulse/core/result_or_die.h"
@@ -22,6 +24,20 @@
 #include "vigil/handlers/list_transactions_handler.h"
 #include "vigil/trade_service.h"
 
+// TODO(move to pulse)
+const char* GetFlag(int argc, char** argv, const char* flag,
+                    const char* default_value) {
+  for (int i = 1; i < argc; i++) {
+    if (strncmp(argv[i], flag, strlen(flag)) == 0) {
+      if (const char* eq = strchr(argv[i], '='); eq != nullptr) {
+        return eq + 1;
+      }
+    }
+  }
+
+  return default_value;
+}
+
 using AccountHandlers =
     pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
                         vigil::DeleteAccountHandler,
@@ -36,8 +52,9 @@ using TradeHandlers =
 using HoldingHandlers =
     pulse::http::Routes<vigil::ListHoldingsHandler, vigil::GetHoldingHandler>;
 
-int main() {
-  vigil::Database db = pulse::unwrap_or_die(vigil::Database::Open("vigil.db"));
+int main(int argc, char** argv) {
+  vigil::Database db = pulse::unwrap_or_die(
+      vigil::Database::Open(GetFlag(argc, argv, "--db", "vigil.db")));
   pulse::die_if_error(db.Initialize());
 
   vigil::AccountsDao accounts_dao(db);
@@ -61,7 +78,7 @@ int main() {
           pulse::http::Router::Make<pulse::http::Routes<
               vigil::HealthHandler, AccountHandlers, TransactionHandlers,
               TradeHandlers, HoldingHandlers>>(ctx)),
-      {.port = 8080, .threads = 1});
+      {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
   server.run();
 
   return 0;
