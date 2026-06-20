@@ -70,12 +70,23 @@ code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts \
   -d '{"name": "brokerage", "type": "BROKERAGE"}')
 assert_status "Accounts/CreateAccount.ValidRequest/Returns201" "201" "$code"
 
+code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts \
+  -H "Content-Type: application/json" \
+  -d '{"name": "checking", "type": "CHECKING"}')
+assert_status "Accounts/CreateAccount.CheckingAccount/Returns201" "201" "$code"
+
 body=$(curl -s $BASE/accounts)
-assert_contains "Accounts/ListAccounts.AfterCreate/ContainsAccount" '"name":"brokerage"' "$body"
+assert_contains "Accounts/ListAccounts.AfterCreate/ContainsBrokerage" '"name":"brokerage"' "$body"
+assert_contains "Accounts/ListAccounts.AfterCreate/ContainsChecking" '"name":"checking"' "$body"
 
 body=$(curl -s $BASE/accounts/brokerage)
-assert_contains "Accounts/GetAccount.ExistingAccount/ReturnsName" '"name": "brokerage"' "$body"
-assert_contains "Accounts/GetAccount.ExistingAccount/ReturnsType" '"type": "BROKERAGE"' "$body"
+assert_contains "Accounts/GetAccount.BrokerageAccount/ReturnsName" '"name":"brokerage"' "$body"
+assert_contains "Accounts/GetAccount.BrokerageAccount/ReturnsType" '"type":"BROKERAGE"' "$body"
+assert_contains "Accounts/GetAccount.BrokerageAccount/NoBalanceField" '"id"' "$body"
+
+body=$(curl -s $BASE/accounts/checking)
+assert_contains "Accounts/GetAccount.CheckingAccount/ReturnsName" '"name":"checking"' "$body"
+assert_contains "Accounts/GetAccount.CheckingAccount/ReturnsBalance" '"balance":0' "$body"
 
 code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts \
   -H "Content-Type: application/json" \
@@ -87,20 +98,23 @@ assert_status "Accounts/GetAccount.NonexistentAccount/Returns404" "404" "$code"
 
 section "===== transactions ====="
 
-code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts/brokerage/transactions \
+code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts/checking/transactions \
   -H "Content-Type: application/json" \
   -d '{"type": "DEPOSIT", "amount": 10000.0, "description": "initial deposit"}')
 assert_status "Transactions/CreateTransaction.ValidDeposit/Returns201" "201" "$code"
 
-body=$(curl -s $BASE/accounts/brokerage/transactions)
+body=$(curl -s $BASE/accounts/checking/transactions)
 assert_contains "Transactions/ListTransactions.AfterDeposit/ContainsType" '"type":"DEPOSIT"' "$body"
 assert_contains "Transactions/ListTransactions.AfterDeposit/ContainsAmount" '"amount":10000' "$body"
 assert_contains "Transactions/ListTransactions.AfterDeposit/ContainsDescription" '"description":"initial deposit"' "$body"
 
-code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts/brokerage/transactions \
+code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts/checking/transactions \
   -H "Content-Type: application/json" \
   -d '{"type": "WITHDRAWAL", "amount": 500.0}')
 assert_status "Transactions/CreateTransaction.ValidWithdrawal/Returns201" "201" "$code"
+
+body=$(curl -s $BASE/accounts/checking)
+assert_contains "Accounts/GetAccount.CheckingAccount/BalanceAfterTransactions" '"balance":9500' "$body"
 
 code=$(curl -s -o /dev/null -w "%{http_code}" -X POST $BASE/accounts/nonexistent/transactions \
   -H "Content-Type: application/json" \
@@ -185,6 +199,9 @@ section "===== cascade delete ====="
 
 code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE $BASE/accounts/brokerage)
 assert_status "Accounts/DeleteAccount.ExistingAccount/Returns204" "204" "$code"
+
+code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE $BASE/accounts/checking)
+assert_status "Accounts/DeleteAccount.CheckingAccount/Returns204" "204" "$code"
 
 code=$(curl -s -o /dev/null -w "%{http_code}" $BASE/accounts/brokerage)
 assert_status "Accounts/GetAccount.AfterDelete/Returns404" "404" "$code"

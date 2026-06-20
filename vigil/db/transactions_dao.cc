@@ -82,5 +82,25 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
 
   return transactions;
 }
+pulse::Result<double> TransactionsDao::GetBalance(
+    std::string_view account_name) {
+  double balance = 0.0;
+  if (pulse::Result<void> err = db_.Execute(
+          R"sql(
+            SELECT
+              COALESCE(SUM(CASE WHEN Type = 'DEPOSIT' THEN Amount ELSE -Amount END), 0.0)
+            FROM
+              Transactions
+            WHERE
+              AccountId = (SELECT Id FROM Accounts WHERE Name = :account_name)
+          )sql",
+          /*parameters=*/{{":account_name", account_name}},
+          [&balance](double b) { balance = b; });
+      !err.ok()) {
+    return err.error();
+  }
+
+  return balance;
+}
 
 }  // namespace vigil

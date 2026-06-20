@@ -4,6 +4,7 @@
 
 #include "pulse/core/enum_macros.h"
 #include "pulse/core/stringify.h"
+#include "pulse/strings/cat.h"
 
 namespace vigil {
 
@@ -34,9 +35,8 @@ PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE);
 template <>
 struct pulse::Stringify<vigil::Account> {
   static std::string to_string(const vigil::Account& account) {
-    return "Account{.id=" + std::to_string(account.id) +
-           ",.name=" + account.name + ",.type=" +
-           pulse::Stringify<vigil::Account::Type>::to_string(account.type) +
-           "}";
+    return pulse::strings::cat("Account{.id=", std::to_string(account.id),
+                               ",.name=", account.name, ",.type=", account.type,
+                               "}");
   }
 };

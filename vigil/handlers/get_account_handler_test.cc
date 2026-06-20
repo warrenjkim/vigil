@@ -13,6 +13,8 @@
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
+#include "vigil/db/transaction.h"
+#include "vigil/db/transactions_dao.h"
 
 namespace vigil {
 
@@ -24,16 +26,20 @@ using ::pulse::http::Router;
 using ::pulse::http::Routes;
 using ::pulse::http::ServerContext;
 using ::testing::Eq;
+using ::testing::HasSubstr;
 
 class GetAccountHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
     db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
     pulse::die_if_error(db_.Initialize());
-    dao_ = std::make_unique<AccountsDao>(db_);
 
-    ServerContext<AccountsDao*> ctx;
-    ctx.set(dao_.get());
+    accounts_dao_ = std::make_unique<AccountsDao>(db_);
+    transactions_dao_ = std::make_unique<TransactionsDao>(db_);
+
+    ServerContext<AccountsDao*, TransactionsDao*> ctx;
+    ctx.set(accounts_dao_.get());
+    ctx.set(transactions_dao_.get());
     router_ =
         pulse::unwrap_or_die(Router::Make<Routes<GetAccountHandler>>(ctx));
   }
@@ -45,7 +51,8 @@ class GetAccountHandlerTest : public ::testing::Test {
   }
 
   Database db_;
-  std::unique_ptr<AccountsDao> dao_;
+  std::unique_ptr<AccountsDao> accounts_dao_;
+  std::unique_ptr<TransactionsDao> transactions_dao_;
   Router router_;
 };
 
@@ -56,12 +63,39 @@ TEST_F(GetAccountHandlerTest, NotFound) {
 
 TEST_F(GetAccountHandlerTest, GetAccount) {
   pulse::die_if_error(
-      dao_->CreateAccount("checking", Account::Type::kChecking));
-  EXPECT_THAT(
-      RunMethod(Request{.path = {{"name", "checking"}}}),
-      Eq(Response{.content_type = "application/json",
-                  .status = 200,
-                  .body = R"({"id":1,"name":"checking","type":"CHECKING"})"}));
+      accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
+
+  Response response = RunMethod(Request{.path = {{"name", "checking"}}});
+  EXPECT_THAT(response.status, Eq(200));
+  EXPECT_THAT(response.body, HasSubstr(R"("name":"checking")"));
+  EXPECT_THAT(response.body, HasSubstr(R"("type":"CHECKING")"));
+  EXPECT_THAT(response.body, HasSubstr(R"("balance":0)"));
+}
+
+TEST_F(GetAccountHandlerTest, GetAccountBrokerageHasNoBalance) {
+  pulse::die_if_error(
+      accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
+
+  Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
+  EXPECT_THAT(response.status, Eq(200));
+  EXPECT_THAT(response.body, HasSubstr(R"("type":"BROKERAGE")"));
+  // balance field should not be present for brokerage accounts
+  EXPECT_THAT(response.body, Not(HasSubstr(R"("balance")")));
+}
+
+TEST_F(GetAccountHandlerTest, GetAccountWithBalance) {
+  pulse::die_if_error(
+      accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
+  pulse::die_if_error(transactions_dao_->CreateTransaction(
+      /*account_name=*/"checking", Transaction::Type::kDeposit,
+      /*amount=*/1000.0));
+  pulse::die_if_error(transactions_dao_->CreateTransaction(
+      /*account_name=*/"checking", Transaction::Type::kWithdrawal,
+      /*amount=*/250.0));
+
+  Response response = RunMethod(Request{.path = {{"name", "checking"}}});
+  EXPECT_THAT(response.status, Eq(200));
+  EXPECT_THAT(response.body, HasSubstr(R"("balance":750)"));
 }
 
 }  // namespace

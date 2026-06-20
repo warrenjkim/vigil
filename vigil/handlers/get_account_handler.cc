@@ -1,7 +1,7 @@
 #include "vigil/handlers/get_account_handler.h"
 
 #include <string>
-#include <utility>
+#include <string_view>
 
 #include "pulse/core/log.h"
 #include "pulse/core/result.h"
@@ -11,6 +11,7 @@
 #include "pulse/json/value.h"
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
+#include "vigil/db/transactions_dao.h"
 
 namespace vigil {
 
@@ -26,7 +27,7 @@ pulse::http::Response GetAccountHandler::operator()(
 
   pulse::Log() << "GetAccount: handling request (name='" << *name << "')";
 
-  pulse::Result<Account> account = dao_.GetAccount(*name);
+  pulse::Result<Account> account = accounts_dao_.GetAccount(*name);
   if (!account.ok()) {
     pulse::Log() << "GetAccount: lookup failed: " << account.error().message;
     return pulse::http::Response{.content_type = "application/json",
@@ -34,15 +35,29 @@ pulse::http::Response GetAccountHandler::operator()(
                                  .body = R"({"status": "not found"})"};
   }
 
-  pulse::Log() << "GetAccount: lookup succeeded: "
-               << pulse::to_string(*account);
+  pulse::json::object_t body{{"id", account->id},
+                             {"name", account->name},
+                             {"type", pulse::to_string(account->type)}};
+
+  if (account->type == Account::Type::kChecking ||
+      account->type == Account::Type::kSavings) {
+    pulse::Result<double> balance = transactions_dao_.GetBalance(*name);
+    if (!balance.ok()) {
+      pulse::Log() << "GetAccount: balance lookup failed: "
+                   << balance.error().message;
+      return pulse::http::Response{.content_type = "application/json",
+                                   .status = 500,
+                                   .body = R"({"status": "internal"})"};
+    }
+
+    body["balance"] = *balance;
+  }
+
+  pulse::Log() << "GetAccount: lookup succeeded: " << pulse::to_string(body);
 
   return pulse::http::Response{.content_type = "application/json",
                                .status = 200,
-                               .body = pulse::to_string(pulse::json::object_t{
-                                   {"id", account->id},
-                                   {"name", std::move(account->name)},
-                                   {"type", pulse::to_string(account->type)}})};
+                               .body = pulse::to_string(body)};
 }
 
 }  // namespace vigil

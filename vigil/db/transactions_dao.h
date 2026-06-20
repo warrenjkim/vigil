@@ -21,6 +21,8 @@ class TransactionsDao {
   pulse::Result<std::vector<Transaction>> ListTransactions(
       std::string_view account_name);
 
+  pulse::Result<double> GetBalance(std::string_view account_name);
+
  private:
   Database db_;
 };

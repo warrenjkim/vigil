@@ -131,6 +131,60 @@ TEST_F(TransactionsDaoTest, CreateForNonexistentAccount) {
   EXPECT_FALSE(result.ok());
 }
 
+TEST_F(TransactionsDaoTest, GetBalanceSingleDeposit) {
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
+                                      Transaction::Type::kDeposit,
+                                      /*amount=*/100.0)
+                  .ok());
+
+  pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
+  ASSERT_TRUE(result.ok());
+  EXPECT_THAT(*result, Eq(100.0));
+}
+
+TEST_F(TransactionsDaoTest, GetBalanceDepositsAndWithdrawals) {
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
+                                      Transaction::Type::kDeposit,
+                                      /*amount=*/1000.0)
+                  .ok());
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
+                                      Transaction::Type::kWithdrawal,
+                                      /*amount=*/250.0)
+                  .ok());
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
+                                      Transaction::Type::kDeposit,
+                                      /*amount=*/500.0)
+                  .ok());
+
+  pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
+  ASSERT_TRUE(result.ok());
+  EXPECT_THAT(*result, Eq(1250.0));
+}
+
+TEST_F(TransactionsDaoTest, GetBalanceIsolatedByAccount) {
+  ASSERT_TRUE(
+      accounts_dao_->CreateAccount("savings", Account::Type::kSavings).ok());
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
+                                      Transaction::Type::kDeposit,
+                                      /*amount=*/100.0)
+                  .ok());
+  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"savings",
+                                      Transaction::Type::kDeposit,
+                                      /*amount=*/999.0)
+                  .ok());
+
+  pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
+  ASSERT_TRUE(result.ok());
+  EXPECT_THAT(*result, Eq(100.0));
+}
+
+TEST_F(TransactionsDaoTest, GetBalanceNonexistentAccount) {
+  pulse::Result<double> result =
+      dao_->GetBalance(/*account_name=*/"nonexistent");
+  ASSERT_TRUE(result.ok());
+  EXPECT_THAT(*result, Eq(0.0));
+}
+
 }  // namespace
 
 }  // namespace vigil
