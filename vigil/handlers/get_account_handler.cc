@@ -1,12 +1,14 @@
 #include "vigil/handlers/get_account_handler.h"
 
 #include <string>
+#include <utility>
 
 #include "pulse/core/log.h"
 #include "pulse/core/result.h"
 #include "pulse/core/stringify.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
+#include "pulse/json/value.h"
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 
@@ -35,12 +37,12 @@ pulse::http::Response GetAccountHandler::operator()(
   pulse::Log() << "GetAccount: lookup succeeded: "
                << pulse::to_string(*account);
 
-  return pulse::http::Response{
-      .content_type = "application/json",
-      .status = 200,
-      .body = "{\"id\": " + std::to_string(account->id) + ", \"name\": \"" +
-              account->name + "\", \"type\": \"" +
-              pulse::to_string(account->type) + "\"}"};
+  return pulse::http::Response{.content_type = "application/json",
+                               .status = 200,
+                               .body = pulse::to_string(pulse::json::object_t{
+                                   {"id", account->id},
+                                   {"name", std::move(account->name)},
+                                   {"type", pulse::to_string(account->type)}})};
 }
 
 }  // namespace vigil

@@ -59,10 +59,9 @@ TEST_F(GetAccountHandlerTest, GetAccount) {
       dao_->CreateAccount("checking", Account::Type::kChecking));
   EXPECT_THAT(
       RunMethod(Request{.path = {{"name", "checking"}}}),
-      Eq(Response{
-          .content_type = "application/json",
-          .status = 200,
-          .body = R"({"id": 1, "name": "checking", "type": "CHECKING"})"}));
+      Eq(Response{.content_type = "application/json",
+                  .status = 200,
+                  .body = R"({"id":1,"name":"checking","type":"CHECKING"})"}));
 }
 
 }  // namespace
