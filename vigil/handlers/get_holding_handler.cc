@@ -16,7 +16,7 @@ namespace vigil {
 
 pulse::http::Response GetHoldingHandler::operator()(
     const pulse::http::Request& request) const {
-  auto account_name = request.path.get<std::string>("name");
+  auto account_name = request.path.Get<std::string>("name");
   if (!account_name.ok()) {
     pulse::Log() << "GetHolding: getting 'name': "
                  << account_name.error().message;
@@ -25,7 +25,7 @@ pulse::http::Response GetHoldingHandler::operator()(
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  auto ticker = request.path.get<std::string>("ticker");
+  auto ticker = request.path.Get<std::string>("ticker");
   if (!ticker.ok()) {
     pulse::Log() << "GetHolding: getting 'ticker': " << ticker.error().message;
     return pulse::http::Response{.content_type = "application/json",
@@ -44,13 +44,12 @@ pulse::http::Response GetHoldingHandler::operator()(
                                  .body = R"({"status": "not found"})"};
   }
 
-  pulse::Log() << "GetHolding: lookup succeeded: "
-               << pulse::to_string(*holding);
+  pulse::Log() << "GetHolding: lookup succeeded: " << pulse::ToString(*holding);
 
   return pulse::http::Response{
       .content_type = "application/json",
       .status = 200,
-      .body = pulse::to_string(pulse::json::object_t{
+      .body = pulse::ToString(pulse::json::Object{
           {"id", holding->id},
           {"account_name", std::move(holding->account_name)},
           {"ticker", std::move(holding->ticker)},

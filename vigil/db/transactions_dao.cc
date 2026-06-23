@@ -38,7 +38,7 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
         )
       )sql",
       /*parameters=*/{{":account_name", account_name},
-                      {":type", pulse::to_string(type)},
+                      {":type", pulse::ToString(type)},
                       {":amount", amount},
                       {":description", description},
                       {":timestamp", Time::Now().ToUnixSeconds()}});
@@ -71,7 +71,7 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
             transactions.push_back(
                 Transaction{.id = id,
                             .account_name = std::move(account_name),
-                            .type = to_transfer_type(type),
+                            .type = ToTransferType(type),
                             .amount = amount,
                             .description = std::move(description),
                             .timestamp = Time::FromUnixSeconds(timestamp)});

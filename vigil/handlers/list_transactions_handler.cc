@@ -18,7 +18,7 @@ namespace vigil {
 
 pulse::http::Response ListTransactionsHandler::operator()(
     const pulse::http::Request& request) const {
-  auto name = request.path.get<std::string>("name");
+  auto name = request.path.Get<std::string>("name");
   if (!name.ok()) {
     pulse::Log() << "ListTransactions: getting 'name': "
                  << name.error().message;
@@ -41,25 +41,25 @@ pulse::http::Response ListTransactionsHandler::operator()(
 
   pulse::Log() << "ListTransactions: list succeeded (name='" << *name
                << "', count=" << transactions->size()
-               << ", transactions=" << pulse::to_string(*transactions);
+               << ", transactions=" << pulse::ToString(*transactions);
 
-  pulse::json::array_t response_body;
+  pulse::json::Array response_body;
   response_body.reserve(transactions->size());
   for (auto& [transaction_id, account_name, type, amount, description,
               timestamp] : *transactions) {
-    response_body.push_back(pulse::json::object_t{
+    response_body.push_back(pulse::json::Object{
         {"id", transaction_id},
         {"account_name", std::move(account_name)},
-        {"type", pulse::to_string(type)},
+        {"type", pulse::ToString(type)},
         {"amount", amount},
         {"description", description.has_value() ? *std::move(description)
-                                                : pulse::json::value{nullptr}},
-        {"timestamp", pulse::to_string(timestamp)}});
+                                                : pulse::json::Value{nullptr}},
+        {"timestamp", pulse::ToString(timestamp)}});
   }
 
   return pulse::http::Response{.content_type = "application/json",
                                .status = 200,
-                               .body = pulse::to_string(response_body)};
+                               .body = pulse::ToString(response_body)};
 }
 
 }  // namespace vigil

@@ -28,7 +28,8 @@ TEST(HealthHandlerTest, ReturnsOk) {
       Router::Make<Routes<HealthHandler>>(ServerContext<>{});
   ASSERT_TRUE(router.ok());
 
-  std::optional<Router::Match> match = router->match(Method::kGet, "/health");
+  std::optional<Router::RouteMatch> match =
+      router->Match(Method::kGet, "/health");
   ASSERT_TRUE(match.has_value());
 
   EXPECT_THAT((*match->handler)(Request{}),

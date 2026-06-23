@@ -17,7 +17,7 @@ namespace vigil {
 
 pulse::http::Response GetAccountHandler::operator()(
     const pulse::http::Request& request) const {
-  auto name = request.path.get<std::string>("name");
+  auto name = request.path.Get<std::string>("name");
   if (!name.ok()) {
     pulse::Log() << "GetAccount: getting 'name': " << name.error().message;
     return pulse::http::Response{.content_type = "application/json",
@@ -35,9 +35,9 @@ pulse::http::Response GetAccountHandler::operator()(
                                  .body = R"({"status": "not found"})"};
   }
 
-  pulse::json::object_t body{{"id", account->id},
-                             {"name", account->name},
-                             {"type", pulse::to_string(account->type)}};
+  pulse::json::Object body{{"id", account->id},
+                           {"name", account->name},
+                           {"type", pulse::ToString(account->type)}};
 
   if (account->type == Account::Type::kChecking ||
       account->type == Account::Type::kSavings) {
@@ -53,11 +53,11 @@ pulse::http::Response GetAccountHandler::operator()(
     body["balance"] = *balance;
   }
 
-  pulse::Log() << "GetAccount: lookup succeeded: " << pulse::to_string(body);
+  pulse::Log() << "GetAccount: lookup succeeded: " << pulse::ToString(body);
 
   return pulse::http::Response{.content_type = "application/json",
                                .status = 200,
-                               .body = pulse::to_string(body)};
+                               .body = pulse::ToString(body)};
 }
 
 }  // namespace vigil

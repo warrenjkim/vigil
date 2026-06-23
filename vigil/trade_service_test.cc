@@ -25,11 +25,11 @@ using ::testing::Eq;
 class TradeServiceTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_.emplace(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
 
     holdings_dao_.emplace(db_);

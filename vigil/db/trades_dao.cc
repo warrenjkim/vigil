@@ -42,7 +42,7 @@ pulse::Result<void> TradesDao::CreateTrade(
         )
       )sql",
       /*parameters=*/{{":account_name", account_name},
-                      {":type", pulse::to_string(type)},
+                      {":type", pulse::ToString(type)},
                       {":ticker", ticker},
                       {":shares", shares},
                       {":price", price},

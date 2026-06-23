@@ -32,7 +32,7 @@ struct CreateAccountRequest {
 
 pulse::http::Response CreateAccountHandler::operator()(
     const pulse::http::Request& request) const {
-  pulse::Result<pulse::json::value> body = pulse::json::parse(request.body);
+  pulse::Result<pulse::json::Value> body = pulse::json::Parse(request.body);
   if (!body.ok()) {
     pulse::Log() << "CreateAccount: parsing body: " << body.error().message;
     return pulse::http::Response{.content_type = "application/json",
@@ -48,7 +48,7 @@ pulse::http::Response CreateAccountHandler::operator()(
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  Account::Type account_type = to_account_type(req->type);
+  Account::Type account_type = ToAccountType(req->type);
   if (account_type == Account::Type::kUnknown) {
     pulse::Log() << "CreateAccount: unrecognized type '" << req->type << "'";
     return pulse::http::Response{.content_type = "application/json",

@@ -51,7 +51,7 @@ pulse::Result<void> TradeService::RecordTrade(
             if (!holding.ok()) {
               return pulse::Error{
                   .code = pulse::Error::Code::kFailedPrecondition,
-                  .message = pulse::strings::cat("no position in ", ticker)};
+                  .message = pulse::strings::Cat("no position in ", ticker)};
             }
 
             const double new_shares = holding->shares - shares;
@@ -59,7 +59,7 @@ pulse::Result<void> TradeService::RecordTrade(
               return pulse::Error{
                   .code = pulse::Error::Code::kFailedPrecondition,
                   .message =
-                      pulse::strings::cat("insufficient shares in ", ticker)};
+                      pulse::strings::Cat("insufficient shares in ", ticker)};
             }
 
             if (new_shares == 0) {

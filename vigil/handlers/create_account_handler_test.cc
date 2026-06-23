@@ -29,20 +29,20 @@ using ::testing::Eq;
 class CreateAccountHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
     dao_ = std::make_unique<AccountsDao>(db_);
 
     ServerContext<AccountsDao*> ctx;
     ctx.set(dao_.get());
     router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<CreateAccountHandler>>(ctx));
+        pulse::UnwrapOrDie(Router::Make<Routes<CreateAccountHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
         *router_
-             .match(CreateAccountHandler::kMethod, CreateAccountHandler::kPath)
+             .Match(CreateAccountHandler::kMethod, CreateAccountHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -89,8 +89,7 @@ TEST_F(CreateAccountHandlerTest, UnrecognizedType) {
 }
 
 TEST_F(CreateAccountHandlerTest, DuplicateCreate) {
-  pulse::die_if_error(
-      dao_->CreateAccount("checking", Account::Type::kChecking));
+  pulse::DieIfError(dao_->CreateAccount("checking", Account::Type::kChecking));
   EXPECT_THAT(
       RunMethod(Request{.body = R"({"name": "checking", "type": "CHECKING"})"})
           .status,

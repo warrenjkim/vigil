@@ -31,11 +31,11 @@ using ::testing::Eq;
 class CreateTradeHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
 
     holdings_dao_ = std::make_unique<HoldingsDao>(db_);
@@ -45,13 +45,12 @@ class CreateTradeHandlerTest : public ::testing::Test {
 
     ServerContext<TradeService*> ctx;
     ctx.set(service_.get());
-    router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<CreateTradeHandler>>(ctx));
+    router_ = pulse::UnwrapOrDie(Router::Make<Routes<CreateTradeHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
-        *router_.match(CreateTradeHandler::kMethod, CreateTradeHandler::kPath)
+        *router_.Match(CreateTradeHandler::kMethod, CreateTradeHandler::kPath)
              ->handler)(std::move(req));
   }
 

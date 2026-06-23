@@ -40,7 +40,7 @@ struct CreateTradeRequest {
 
 pulse::http::Response CreateTradeHandler::operator()(
     const pulse::http::Request& request) const {
-  auto account_name = request.path.get<std::string>("name");
+  auto account_name = request.path.Get<std::string>("name");
   if (!account_name.ok()) {
     pulse::Log() << "CreateTrade: getting 'name': "
                  << account_name.error().message;
@@ -49,7 +49,7 @@ pulse::http::Response CreateTradeHandler::operator()(
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  pulse::Result<pulse::json::value> body = pulse::json::parse(request.body);
+  pulse::Result<pulse::json::Value> body = pulse::json::Parse(request.body);
   if (!body.ok()) {
     pulse::Log() << "CreateTrade: parsing body: " << body.error().message;
     return pulse::http::Response{.content_type = "application/json",

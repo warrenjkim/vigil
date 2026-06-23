@@ -27,21 +27,21 @@ pulse::http::Response ListAccountsHandler::operator()(
   }
 
   pulse::Log() << "ListAccounts: list succeeded (count=" << accounts->size()
-               << ", accounts=" << pulse::to_string(*accounts) << ")";
+               << ", accounts=" << pulse::ToString(*accounts) << ")";
 
-  pulse::json::array_t response_body;
+  pulse::json::Array response_body;
   response_body.reserve(accounts->size());
   for (auto& [id, name, type] : *accounts) {
     response_body.push_back(
-        pulse::json::object_t{{"id", id},
-                              {"name", std::move(name)},
-                              {"type", pulse::to_string(type)}});
+        pulse::json::Object{{"id", id},
+                            {"name", std::move(name)},
+                            {"type", pulse::ToString(type)}});
   }
 
   return pulse::http::Response{
       .content_type = "application/json",
       .status = 200,
-      .body = pulse::to_string(pulse::json::array_t(std::move(response_body)))};
+      .body = pulse::ToString(pulse::json::Array(std::move(response_body)))};
 }
 
 }  // namespace vigil

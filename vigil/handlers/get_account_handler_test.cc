@@ -31,8 +31,8 @@ using ::testing::HasSubstr;
 class GetAccountHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
     transactions_dao_ = std::make_unique<TransactionsDao>(db_);
@@ -40,13 +40,12 @@ class GetAccountHandlerTest : public ::testing::Test {
     ServerContext<AccountsDao*, TransactionsDao*> ctx;
     ctx.set(accounts_dao_.get());
     ctx.set(transactions_dao_.get());
-    router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<GetAccountHandler>>(ctx));
+    router_ = pulse::UnwrapOrDie(Router::Make<Routes<GetAccountHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
-        *router_.match(GetAccountHandler::kMethod, GetAccountHandler::kPath)
+        *router_.Match(GetAccountHandler::kMethod, GetAccountHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -62,7 +61,7 @@ TEST_F(GetAccountHandlerTest, NotFound) {
 }
 
 TEST_F(GetAccountHandlerTest, GetAccount) {
-  pulse::die_if_error(
+  pulse::DieIfError(
       accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -73,7 +72,7 @@ TEST_F(GetAccountHandlerTest, GetAccount) {
 }
 
 TEST_F(GetAccountHandlerTest, GetAccountBrokerageHasNoBalance) {
-  pulse::die_if_error(
+  pulse::DieIfError(
       accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
 
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
@@ -84,12 +83,12 @@ TEST_F(GetAccountHandlerTest, GetAccountBrokerageHasNoBalance) {
 }
 
 TEST_F(GetAccountHandlerTest, GetAccountWithBalance) {
-  pulse::die_if_error(
+  pulse::DieIfError(
       accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", Transaction::Type::kDeposit,
       /*amount=*/1000.0));
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", Transaction::Type::kWithdrawal,
       /*amount=*/250.0));
 

@@ -29,20 +29,20 @@ using ::testing::HasSubstr;
 class ListAccountsHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
     dao_ = std::make_unique<AccountsDao>(db_);
 
     ServerContext<AccountsDao*> ctx;
     ctx.set(dao_.get());
     router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<ListAccountsHandler>>(ctx));
+        pulse::UnwrapOrDie(Router::Make<Routes<ListAccountsHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
         *router_
-             .match(ListAccountsHandler::kMethod, ListAccountsHandler::kPath)
+             .Match(ListAccountsHandler::kMethod, ListAccountsHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -58,8 +58,7 @@ TEST_F(ListAccountsHandlerTest, EmptyList) {
 }
 
 TEST_F(ListAccountsHandlerTest, ListsAccounts) {
-  pulse::die_if_error(
-      dao_->CreateAccount("checking", Account::Type::kChecking));
+  pulse::DieIfError(dao_->CreateAccount("checking", Account::Type::kChecking));
 
   Response response = RunMethod(Request{});
   EXPECT_THAT(response.status, Eq(200));
@@ -68,9 +67,8 @@ TEST_F(ListAccountsHandlerTest, ListsAccounts) {
 }
 
 TEST_F(ListAccountsHandlerTest, MultipleAccounts) {
-  pulse::die_if_error(
-      dao_->CreateAccount("checking", Account::Type::kChecking));
-  pulse::die_if_error(dao_->CreateAccount("savings", Account::Type::kSavings));
+  pulse::DieIfError(dao_->CreateAccount("checking", Account::Type::kChecking));
+  pulse::DieIfError(dao_->CreateAccount("savings", Account::Type::kSavings));
 
   Response response = RunMethod(Request{});
   EXPECT_THAT(response.status, Eq(200));

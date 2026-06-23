@@ -36,7 +36,7 @@ class Time {
 
 template <>
 struct pulse::Stringify<vigil::Time> {
-  static std::string to_string(const vigil::Time& t) {
+  static std::string ToString(const vigil::Time& t) {
     time_t s = static_cast<time_t>(t.ToUnixSeconds());
     std::tm tm;
     gmtime_r(&s, &tm);

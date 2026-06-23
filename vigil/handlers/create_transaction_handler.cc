@@ -35,7 +35,7 @@ struct CreateTransactionRequest {
 
 pulse::http::Response CreateTransactionHandler::operator()(
     const pulse::http::Request& request) const {
-  auto name = request.path.get<std::string>("name");
+  auto name = request.path.Get<std::string>("name");
   if (!name.ok()) {
     pulse::Log() << "CreateTransaction: getting 'name': "
                  << name.error().message;
@@ -44,7 +44,7 @@ pulse::http::Response CreateTransactionHandler::operator()(
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  pulse::Result<pulse::json::value> body = pulse::json::parse(request.body);
+  pulse::Result<pulse::json::Value> body = pulse::json::Parse(request.body);
   if (!body.ok()) {
     pulse::Log() << "CreateTransaction: parsing body: " << body.error().message;
     return pulse::http::Response{.content_type = "application/json",
@@ -60,7 +60,7 @@ pulse::http::Response CreateTransactionHandler::operator()(
                                  .body = R"({"status": "invalid argument"})"};
   }
 
-  Transaction::Type transfer_type = to_transfer_type(req->type);
+  Transaction::Type transfer_type = ToTransferType(req->type);
   if (transfer_type == Transaction::Type::kUnknown) {
     pulse::Log() << "CreateTransaction: unrecognized type '" << req->type
                  << "'";

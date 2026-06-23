@@ -21,7 +21,7 @@ pulse::Result<void> AccountsDao::CreateAccount(std::string_view name,
                                                Account::Type type) {
   return db_.Execute(
       R"sql(INSERT INTO Accounts (Name, Type) VALUES (:name, :type) )sql",
-      {{":name", name}, {":type", pulse::to_string(type)}});
+      {{":name", name}, {":type", pulse::ToString(type)}});
 }
 
 pulse::Result<Account> AccountsDao::GetAccount(std::string_view name) {
@@ -30,8 +30,7 @@ pulse::Result<Account> AccountsDao::GetAccount(std::string_view name) {
           R"sql(SELECT Id, Name, Type FROM Accounts WHERE Name = :name)sql",
           {{":name", name}},
           [&account](int id, std::string n, std::string type) {
-            account =
-                Account{.id = id, .name = n, .type = to_account_type(type)};
+            account = Account{.id = id, .name = n, .type = ToAccountType(type)};
           });
       !err.ok()) {
     return err.error();
@@ -51,7 +50,7 @@ pulse::Result<std::vector<Account>> AccountsDao::ListAccounts() {
           [&accounts](int id, std::string name, std::string type) {
             accounts.push_back(Account{.id = id,
                                        .name = std::move(name),
-                                       .type = to_account_type(type)});
+                                       .type = ToAccountType(type)});
           });
       !err.ok()) {
     return err.error();

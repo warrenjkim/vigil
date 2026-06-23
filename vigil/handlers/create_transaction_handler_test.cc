@@ -34,24 +34,24 @@ using ::testing::SizeIs;
 class CreateTransactionHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
 
     transactions_dao_ = std::make_unique<TransactionsDao>(db_);
 
     ServerContext<TransactionsDao*> ctx;
     ctx.set(transactions_dao_.get());
-    router_ = pulse::unwrap_or_die(
-        Router::Make<Routes<CreateTransactionHandler>>(ctx));
+    router_ =
+        pulse::UnwrapOrDie(Router::Make<Routes<CreateTransactionHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (*router_
-                 .match(CreateTransactionHandler::kMethod,
+                 .Match(CreateTransactionHandler::kMethod,
                         CreateTransactionHandler::kPath)
                  ->handler)(std::move(req));
   }

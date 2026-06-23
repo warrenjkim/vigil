@@ -93,7 +93,7 @@ pulse::Result<void> Database::Execute(
       err != SQLITE_OK) {
     return pulse::Error{
         .code = pulse::Error::Code::kInternal,
-        .message = pulse::strings::cat("sqlite3_prepare_v2 failed: ",
+        .message = pulse::strings::Cat("sqlite3_prepare_v2 failed: ",
                                        sqlite3_errmsg(db_->handle()))};
   }
 
@@ -102,7 +102,7 @@ pulse::Result<void> Database::Execute(
     if (i == 0) {
       (void)sqlite3_finalize(stmt);
       return pulse::Error{.code = pulse::Error::Code::kInternal,
-                          .message = pulse::strings::cat(
+                          .message = pulse::strings::Cat(
                               "no binding found for parameter '", key, "'")};
     }
 
@@ -116,7 +116,7 @@ pulse::Result<void> Database::Execute(
       std::string msg = sqlite3_errmsg(db_->handle());
       (void)sqlite3_finalize(stmt);
       return pulse::Error{.code = pulse::Error::Code::kInternal,
-                          .message = pulse::strings::cat(
+                          .message = pulse::strings::Cat(
                               "failed to bind parameter '", key, "': ", msg)};
     }
   }
@@ -132,7 +132,7 @@ pulse::Result<void> Database::Execute(
   if (int err = sqlite3_finalize(stmt); err != SQLITE_OK) {
     return pulse::Error{
         .code = pulse::Error::Code::kInternal,
-        .message = pulse::strings::cat("sqlite3_finalize failed: ",
+        .message = pulse::strings::Cat("sqlite3_finalize failed: ",
                                        sqlite3_errmsg(db_->handle()))};
   }
 

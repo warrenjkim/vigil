@@ -34,11 +34,11 @@ using ::testing::HasSubstr;
 class GetHoldingHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
 
     holdings_dao_ = std::make_unique<HoldingsDao>(db_);
@@ -48,13 +48,12 @@ class GetHoldingHandlerTest : public ::testing::Test {
 
     ServerContext<HoldingsDao*> ctx;
     ctx.set(holdings_dao_.get());
-    router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<GetHoldingHandler>>(ctx));
+    router_ = pulse::UnwrapOrDie(Router::Make<Routes<GetHoldingHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
-        *router_.match(GetHoldingHandler::kMethod, GetHoldingHandler::kPath)
+        *router_.Match(GetHoldingHandler::kMethod, GetHoldingHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -83,7 +82,7 @@ TEST_F(GetHoldingHandlerTest, NotFound) {
 }
 
 TEST_F(GetHoldingHandlerTest, GetHolding) {
-  pulse::die_if_error(service_->RecordTrade(
+  pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
       /*description=*/std::nullopt));

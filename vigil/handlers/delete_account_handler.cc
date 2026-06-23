@@ -12,7 +12,7 @@ namespace vigil {
 
 pulse::http::Response DeleteAccountHandler::operator()(
     const pulse::http::Request& request) const {
-  auto name = request.path.get<std::string>("name");
+  auto name = request.path.Get<std::string>("name");
   if (!name.ok()) {
     pulse::Log() << "DeleteAccount: getting 'name': " << name.error().message;
     return pulse::http::Response{.content_type = "application/json",

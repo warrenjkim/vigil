@@ -34,11 +34,11 @@ using ::testing::HasSubstr;
 class ListTradesHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
 
     holdings_dao_ = std::make_unique<HoldingsDao>(db_);
@@ -48,13 +48,12 @@ class ListTradesHandlerTest : public ::testing::Test {
 
     ServerContext<TradesDao*> ctx;
     ctx.set(trades_dao_.get());
-    router_ =
-        pulse::unwrap_or_die(Router::Make<Routes<ListTradesHandler>>(ctx));
+    router_ = pulse::UnwrapOrDie(Router::Make<Routes<ListTradesHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
-        *router_.match(ListTradesHandler::kMethod, ListTradesHandler::kPath)
+        *router_.Match(ListTradesHandler::kMethod, ListTradesHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -77,7 +76,7 @@ TEST_F(ListTradesHandlerTest, EmptyList) {
 }
 
 TEST_F(ListTradesHandlerTest, ListsTrades) {
-  pulse::die_if_error(service_->RecordTrade(
+  pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
       /*description=*/std::nullopt));
@@ -90,11 +89,11 @@ TEST_F(ListTradesHandlerTest, ListsTrades) {
 }
 
 TEST_F(ListTradesHandlerTest, MultipleTrades) {
-  pulse::die_if_error(service_->RecordTrade(
+  pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
       /*description=*/std::nullopt));
-  pulse::die_if_error(service_->RecordTrade(
+  pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"AAPL", /*shares=*/5.0, /*price=*/200.0,
       /*description=*/std::nullopt));
@@ -106,7 +105,7 @@ TEST_F(ListTradesHandlerTest, MultipleTrades) {
 }
 
 TEST_F(ListTradesHandlerTest, NullDescription) {
-  pulse::die_if_error(service_->RecordTrade(
+  pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
       /*description=*/std::nullopt));

@@ -37,8 +37,8 @@ PULSE_ENUM_TO_STRING(vigil::Trade::Type, TRADE_TYPE_TABLE);
 
 template <>
 struct pulse::Stringify<vigil::Trade> {
-  static std::string to_string(const vigil::Trade& t) {
-    return pulse::strings::cat(
+  static std::string ToString(const vigil::Trade& t) {
+    return pulse::strings::Cat(
         "Trade{.id=", t.id, ",.account_name=", t.account_name,
         ",.type=", t.type, ",.ticker=", t.ticker, ",.shares=", t.shares,
         ",.price=", t.price, ",.description=",

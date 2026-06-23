@@ -17,7 +17,7 @@ namespace vigil {
 
 pulse::http::Response ListHoldingsHandler::operator()(
     const pulse::http::Request& request) const {
-  auto account_name = request.path.get<std::string>("name");
+  auto account_name = request.path.Get<std::string>("name");
   if (!account_name.ok()) {
     pulse::Log() << "ListHoldings: getting 'name': "
                  << account_name.error().message;
@@ -40,21 +40,21 @@ pulse::http::Response ListHoldingsHandler::operator()(
 
   pulse::Log() << "ListHoldings: list succeeded (name='" << *account_name
                << "', count=" << holdings->size()
-               << ", holdings=" << pulse::to_string(*holdings) << ")";
+               << ", holdings=" << pulse::ToString(*holdings) << ")";
 
-  pulse::json::array_t response_body;
+  pulse::json::Array response_body;
   response_body.reserve(holdings->size());
   for (auto& [id, account_name, ticker, shares] : *holdings) {
     response_body.push_back(
-        pulse::json::object_t{{"id", id},
-                              {"account_name", std::move(account_name)},
-                              {"ticker", std::move(ticker)},
-                              {"shares", shares}});
+        pulse::json::Object{{"id", id},
+                            {"account_name", std::move(account_name)},
+                            {"ticker", std::move(ticker)},
+                            {"shares", shares}});
   }
 
   return pulse::http::Response{.content_type = "application/json",
                                .status = 200,
-                               .body = pulse::to_string(response_body)};
+                               .body = pulse::ToString(response_body)};
 }
 
 }  // namespace vigil

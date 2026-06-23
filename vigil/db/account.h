@@ -26,7 +26,7 @@ struct Account {
   friend bool operator==(const Account&, const Account&) = default;
 };
 
-PULSE_STRING_TO_ENUM(Account::Type, to_account_type, ACCOUNT_TYPE_TABLE);
+PULSE_STRING_TO_ENUM(Account::Type, ToAccountType, ACCOUNT_TYPE_TABLE);
 
 }  // namespace vigil
 
@@ -34,8 +34,8 @@ PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE);
 
 template <>
 struct pulse::Stringify<vigil::Account> {
-  static std::string to_string(const vigil::Account& account) {
-    return pulse::strings::cat("Account{.id=", std::to_string(account.id),
+  static std::string ToString(const vigil::Account& account) {
+    return pulse::strings::Cat("Account{.id=", account.id,
                                ",.name=", account.name, ",.type=", account.type,
                                "}");
   }

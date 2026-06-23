@@ -27,8 +27,7 @@ struct Transaction {
   friend bool operator==(const Transaction&, const Transaction&) = default;
 };
 
-PULSE_STRING_TO_ENUM(Transaction::Type, to_transfer_type,
-                     TRANSACTION_TYPE_TABLE);
+PULSE_STRING_TO_ENUM(Transaction::Type, ToTransferType, TRANSACTION_TYPE_TABLE);
 
 }  // namespace vigil
 
@@ -36,8 +35,8 @@ PULSE_ENUM_TO_STRING(vigil::Transaction::Type, TRANSACTION_TYPE_TABLE);
 
 template <>
 struct pulse::Stringify<vigil::Transaction> {
-  static std::string to_string(const vigil::Transaction& t) {
-    return pulse::strings::cat(
+  static std::string ToString(const vigil::Transaction& t) {
+    return pulse::strings::Cat(
         "Transaction{.id=", t.id, ",.account_name=", t.account_name,
         ",.type=", t.type, ",.amount=", t.amount, ",.description=",
         t.description.has_value() ? *t.description : "std::nullopt",

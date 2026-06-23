@@ -53,9 +53,9 @@ using HoldingHandlers =
     pulse::http::Routes<vigil::ListHoldingsHandler, vigil::GetHoldingHandler>;
 
 int main(int argc, char** argv) {
-  vigil::Database db = pulse::unwrap_or_die(
+  vigil::Database db = pulse::UnwrapOrDie(
       vigil::Database::Open(GetFlag(argc, argv, "--db", "vigil.db")));
-  pulse::die_if_error(db.Initialize());
+  pulse::DieIfError(db.Initialize());
 
   vigil::AccountsDao accounts_dao(db);
   vigil::TransactionsDao transactions_dao(db);
@@ -74,12 +74,12 @@ int main(int argc, char** argv) {
   ctx.set(&trade_service);
 
   pulse::http::Server server(
-      pulse::unwrap_or_die(
+      pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
               vigil::HealthHandler, AccountHandlers, TransactionHandlers,
               TradeHandlers, HoldingHandlers>>(ctx)),
       {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
-  server.run();
+  server.Run();
 
   return 0;
 }

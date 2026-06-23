@@ -20,8 +20,8 @@ struct Holding {
 
 template <>
 struct pulse::Stringify<vigil::Holding> {
-  static std::string to_string(const vigil::Holding& h) {
-    return pulse::strings::cat(
+  static std::string ToString(const vigil::Holding& h) {
+    return pulse::strings::Cat(
         "Holding{.id=", h.id, ",.account_name=", h.account_name,
         ",.ticker=", h.ticker, ",.shares=", h.shares, "}");
   }

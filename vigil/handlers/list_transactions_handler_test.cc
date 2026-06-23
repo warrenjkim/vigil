@@ -32,24 +32,24 @@ using ::testing::HasSubstr;
 class ListTransactionsHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
-    pulse::die_if_error(db_.Initialize());
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
+    pulse::DieIfError(db_.Initialize());
 
     accounts_dao_ = std::make_unique<AccountsDao>(db_);
-    pulse::die_if_error(
+    pulse::DieIfError(
         accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
 
     transactions_dao_ = std::make_unique<TransactionsDao>(db_);
 
     ServerContext<TransactionsDao*> ctx;
     ctx.set(transactions_dao_.get());
-    router_ = pulse::unwrap_or_die(
-        Router::Make<Routes<ListTransactionsHandler>>(ctx));
+    router_ =
+        pulse::UnwrapOrDie(Router::Make<Routes<ListTransactionsHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (*router_
-                 .match(ListTransactionsHandler::kMethod,
+                 .Match(ListTransactionsHandler::kMethod,
                         ListTransactionsHandler::kPath)
                  ->handler)(std::move(req));
   }
@@ -71,7 +71,7 @@ TEST_F(ListTransactionsHandlerTest, EmptyList) {
 }
 
 TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -82,7 +82,7 @@ TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
 }
 
 TEST_F(ListTransactionsHandlerTest, NullDescription) {
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -91,7 +91,7 @@ TEST_F(ListTransactionsHandlerTest, NullDescription) {
 }
 
 TEST_F(ListTransactionsHandlerTest, WithDescription) {
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kDeposit, 100.0, "paycheck"));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -100,9 +100,9 @@ TEST_F(ListTransactionsHandlerTest, WithDescription) {
 }
 
 TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kWithdrawal, 50.0, std::nullopt));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -112,11 +112,11 @@ TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
 }
 
 TEST_F(ListTransactionsHandlerTest, IsolatedByAccount) {
-  pulse::die_if_error(
+  pulse::DieIfError(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings));
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "savings", Transaction::Type::kDeposit, 999.0, std::nullopt));
-  pulse::die_if_error(transactions_dao_->CreateTransaction(
+  pulse::DieIfError(transactions_dao_->CreateTransaction(
       "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});

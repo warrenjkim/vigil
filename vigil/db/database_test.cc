@@ -207,7 +207,7 @@ TEST_F(DatabaseTest, DoubleColumnNull) {
 }
 
 TEST_F(DatabaseTest, InitializeAppliesSchema) {
-  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  Database db = pulse::UnwrapOrDie(Database::Open(":memory:"));
   ASSERT_TRUE(db.Initialize().ok());
 
   int count = -1;
@@ -224,13 +224,13 @@ TEST_F(DatabaseTest, InitializeAppliesSchema) {
 }
 
 TEST_F(DatabaseTest, InitializeIsIdempotent) {
-  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  Database db = pulse::UnwrapOrDie(Database::Open(":memory:"));
   ASSERT_TRUE(db.Initialize().ok());
   EXPECT_TRUE(db.Initialize().ok());
 }
 
 TEST_F(DatabaseTest, RejectsUnknownVersion) {
-  Database db = pulse::unwrap_or_die(Database::Open(":memory:"));
+  Database db = pulse::UnwrapOrDie(Database::Open(":memory:"));
   ASSERT_TRUE(db.Execute("PRAGMA user_version = 99;").ok());
 
   pulse::Result<void> result = db.Initialize();
@@ -241,7 +241,7 @@ TEST_F(DatabaseTest, RejectsUnknownVersion) {
 class WrapInTransactionTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    db_ = pulse::unwrap_or_die(Database::Open(":memory:"));
+    db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
     ASSERT_TRUE(db_.Execute(R"sql(
         CREATE TABLE TestTable (Id INTEGER PRIMARY KEY, Value TEXT NOT NULL);
     )sql")

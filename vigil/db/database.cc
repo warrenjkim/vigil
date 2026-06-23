@@ -72,12 +72,12 @@ pulse::Result<void> Database::Initialize() {
 
   if (version != 0) {
     return pulse::Error{.code = pulse::Error::Code::kInternal,
-                        .message = pulse::strings::cat(
+                        .message = pulse::strings::Cat(
                             "unexpected schema version: ", version,
                             " (binary expects ", kSchemaVersion, ")")};
   }
 
-  const std::string sql = pulse::strings::cat(
+  const std::string sql = pulse::strings::Cat(
       "BEGIN;\n", kSchemaSql, "\nPRAGMA user_version = ", kSchemaVersion,
       ";\nCOMMIT;");
 
@@ -91,7 +91,7 @@ pulse::Result<void> Database::Initialize() {
                        /*arg=*/nullptr, /*errmsg=*/nullptr);
     return pulse::Error{
         .code = pulse::Error::Code::kInternal,
-        .message = pulse::strings::cat("schema initialization failed: ", msg)};
+        .message = pulse::strings::Cat("schema initialization failed: ", msg)};
   }
 
   return pulse::Result<void>{};
