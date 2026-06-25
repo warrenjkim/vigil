@@ -8,6 +8,7 @@ cc_library(
         ":delete_account_handler",
         ":get_account_handler",
         ":get_holding_handler",
+        ":get_new_account_handler",
         ":health_handler",
         ":list_accounts_handler",
         ":list_holdings_handler",
@@ -81,6 +82,34 @@ cc_test(
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/http:router",
+    ],
+)
+
+cc_library(
+    name = "get_new_account_handler",
+    srcs = ["get_new_account_handler.cc"],
+    hdrs = ["get_new_account_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@pulse//pulse/html:attributes",
+        "@pulse//pulse/html:element",
+        "@pulse//pulse/html:tags",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+    ],
+)
+
+cc_test(
+    name = "get_new_account_handler_test",
+    srcs = ["get_new_account_handler_test.cc"],
+    deps = [
+        ":get_new_account_handler",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
     ],
 )
 

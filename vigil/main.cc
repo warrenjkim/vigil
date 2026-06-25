@@ -17,6 +17,7 @@
 #include "vigil/handlers/delete_account_handler.h"
 #include "vigil/handlers/get_account_handler.h"
 #include "vigil/handlers/get_holding_handler.h"
+#include "vigil/handlers/get_new_account_handler.h"
 #include "vigil/handlers/health_handler.h"
 #include "vigil/handlers/list_accounts_handler.h"
 #include "vigil/handlers/list_holdings_handler.h"
@@ -39,7 +40,8 @@ const char* GetFlag(int argc, char** argv, const char* flag,
 }
 
 using AccountHandlers =
-    pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
+    pulse::http::Routes<vigil::GetNewAccountHandler,
+                        vigil::CreateAccountHandler, vigil::GetAccountHandler,
                         vigil::DeleteAccountHandler,
                         vigil::ListAccountsHandler>;
 

@@ -15,6 +15,7 @@ cc_binary(
         "//vigil/handlers:delete_account_handler",
         "//vigil/handlers:get_account_handler",
         "//vigil/handlers:get_holding_handler",
+        "//vigil/handlers:get_new_account_handler",
         "//vigil/handlers:health_handler",
         "//vigil/handlers:list_accounts_handler",
         "//vigil/handlers:list_holdings_handler",
