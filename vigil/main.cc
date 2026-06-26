@@ -19,6 +19,7 @@
 #include "vigil/handlers/get_holding_handler.h"
 #include "vigil/handlers/get_new_account_handler.h"
 #include "vigil/handlers/health_handler.h"
+#include "vigil/handlers/index_handler.h"
 #include "vigil/handlers/list_accounts_handler.h"
 #include "vigil/handlers/list_holdings_handler.h"
 #include "vigil/handlers/list_trades_handler.h"
@@ -78,8 +79,8 @@ int main(int argc, char** argv) {
   pulse::http::Server server(
       pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
-              vigil::HealthHandler, AccountHandlers, TransactionHandlers,
-              TradeHandlers, HoldingHandlers>>(ctx)),
+              vigil::IndexHandler, vigil::HealthHandler, AccountHandlers,
+              TransactionHandlers, TradeHandlers, HoldingHandlers>>(ctx)),
       {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
   server.Run();
 

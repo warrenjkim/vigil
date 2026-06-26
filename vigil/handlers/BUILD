@@ -18,6 +18,20 @@ cc_library(
 )
 
 cc_library(
+    name = "index_handler",
+    srcs = ["index_handler.cc"],
+    hdrs = ["index_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//iris:iris_html",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+    ],
+)
+
+cc_library(
     name = "health_handler",
     srcs = ["health_handler.cc"],
     hdrs = ["health_handler.h"],
