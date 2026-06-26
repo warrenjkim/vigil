@@ -54,15 +54,19 @@ cc_library(
     deps = [
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
+        "@pulse//pulse/core:error",
         "@pulse//pulse/core:log",
         "@pulse//pulse/core:result",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:method",
+        "@pulse//pulse/http:parameters",
+        "@pulse//pulse/http:parse_form",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/json:bind",
         "@pulse//pulse/json:parse",
         "@pulse//pulse/json:value",
+        "@pulse//pulse/strings:cat",
     ],
 )
 

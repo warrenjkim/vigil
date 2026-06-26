@@ -96,6 +96,65 @@ TEST_F(CreateAccountHandlerTest, DuplicateCreate) {
       Eq(500));
 }
 
+TEST_F(CreateAccountHandlerTest, Form) {
+  Response response = RunMethod(Request{
+      .headers = {{"Content-Type", "application/x-www-form-urlencoded"}},
+      .body = "name=checking&type=CHECKING"});
+  EXPECT_THAT(response.status, Eq(303));
+  EXPECT_THAT(response.headers.at("Location"), Eq("/accounts"));
+}
+
+TEST_F(CreateAccountHandlerTest, FormPersistsAccount) {
+  ASSERT_THAT(
+      RunMethod(Request{.headers = {{"Content-Type",
+                                     "application/x-www-form-urlencoded"}},
+                        .body = "name=checking&type=CHECKING"})
+          .status,
+      Eq(303));
+  pulse::Result<Account> account = dao_->GetAccount("checking");
+  ASSERT_TRUE(account.ok());
+  EXPECT_THAT(*account, Eq(Account{.id = 1,
+                                   .name = "checking",
+                                   .type = Account::Type::kChecking}));
+}
+
+TEST_F(CreateAccountHandlerTest, FormMissingName) {
+  EXPECT_THAT(
+      RunMethod(Request{.headers = {{"Content-Type",
+                                     "application/x-www-form-urlencoded"}},
+                        .body = "type=CHECKING"})
+          .status,
+      Eq(400));
+}
+
+TEST_F(CreateAccountHandlerTest, FormMissingType) {
+  EXPECT_THAT(
+      RunMethod(Request{.headers = {{"Content-Type",
+                                     "application/x-www-form-urlencoded"}},
+                        .body = "name=checking"})
+          .status,
+      Eq(400));
+}
+
+TEST_F(CreateAccountHandlerTest, FormUnrecognizedType) {
+  EXPECT_THAT(
+      RunMethod(Request{.headers = {{"Content-Type",
+                                     "application/x-www-form-urlencoded"}},
+                        .body = "name=checking&type=bad_type"})
+          .status,
+      Eq(400));
+}
+
+TEST_F(CreateAccountHandlerTest, FormEncodedName) {
+  Response response = RunMethod(Request{
+      .headers = {{"Content-Type", "application/x-www-form-urlencoded"}},
+      .body = "name=my+checking&type=CHECKING"});
+  EXPECT_THAT(response.status, Eq(303));
+  pulse::Result<Account> account = dao_->GetAccount("my checking");
+  ASSERT_TRUE(account.ok());
+  EXPECT_THAT(account->name, Eq("my checking"));
+}
+
 }  // namespace
 
 }  // namespace vigil
