@@ -1,4 +1,4 @@
-#include "vigil/handlers/get_account_handler.h"
+#include "vigil/handlers/api/accounts/get_account_handler.h"
 
 #include <memory>
 #include <utility>

@@ -1,4 +1,4 @@
-#include "vigil/handlers/get_new_account_handler.h"
+#include "vigil/handlers/pages/get_new_account_handler.h"
 
 #include "pulse/html/attributes.h"
 #include "pulse/html/element.h"

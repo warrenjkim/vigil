@@ -1,4 +1,4 @@
-#include "vigil/handlers/get_new_account_handler.h"
+#include "vigil/handlers/pages/get_new_account_handler.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

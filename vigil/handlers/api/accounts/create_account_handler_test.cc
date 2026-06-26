@@ -1,4 +1,4 @@
-#include "vigil/handlers/create_account_handler.h"
+#include "vigil/handlers/api/accounts/create_account_handler.h"
 
 #include <memory>
 #include <utility>
@@ -101,7 +101,7 @@ TEST_F(CreateAccountHandlerTest, Form) {
       .headers = {{"Content-Type", "application/x-www-form-urlencoded"}},
       .body = "name=checking&type=CHECKING"});
   EXPECT_THAT(response.status, Eq(303));
-  EXPECT_THAT(response.headers.at("Location"), Eq("/accounts"));
+  EXPECT_THAT(response.headers.at("Location"), Eq("/accounts/checking"));
 }
 
 TEST_F(CreateAccountHandlerTest, FormPersistsAccount) {

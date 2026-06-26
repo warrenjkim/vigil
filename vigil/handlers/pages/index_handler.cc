@@ -1,4 +1,4 @@
-#include "vigil/handlers/index_handler.h"
+#include "vigil/handlers/pages/index_handler.h"
 
 #include <string>
 

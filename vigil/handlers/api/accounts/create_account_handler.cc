@@ -1,4 +1,4 @@
-#include "vigil/handlers/create_account_handler.h"
+#include "vigil/handlers/api/accounts/create_account_handler.h"
 
 #include <string>
 #include <utility>

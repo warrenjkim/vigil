@@ -1,4 +1,4 @@
-#include "vigil/handlers/create_trade_handler.h"
+#include "vigil/handlers/api/trades/create_trade_handler.h"
 
 #include <optional>
 #include <string>

@@ -1,4 +1,4 @@
-#include "vigil/handlers/delete_account_handler.h"
+#include "vigil/handlers/api/accounts/delete_account_handler.h"
 
 #include <string>
 

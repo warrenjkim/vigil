@@ -1,6 +1,4 @@
-#include "vigil/handlers/health_handler.h"
-
-#include <optional>
+#include "vigil/handlers/pages/health_handler.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -28,9 +26,9 @@ TEST(HealthHandlerTest, ReturnsOk) {
       Router::Make<Routes<HealthHandler>>(ServerContext<>{});
   ASSERT_TRUE(router.ok());
 
-  std::optional<Router::RouteMatch> match =
+  pulse::Result<Router::RouteMatch> match =
       router->Match(Method::kGet, "/health");
-  ASSERT_TRUE(match.has_value());
+  ASSERT_TRUE(match.ok());
 
   EXPECT_THAT((*match->handler)(Request{}),
               Eq(Response{.content_type = "application/json",

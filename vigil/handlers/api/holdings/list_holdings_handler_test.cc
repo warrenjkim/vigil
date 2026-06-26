@@ -1,4 +1,4 @@
-#include "vigil/handlers/list_trades_handler.h"
+#include "vigil/handlers/api/holdings/list_holdings_handler.h"
 
 #include <memory>
 #include <optional>
@@ -31,7 +31,7 @@ using ::pulse::http::ServerContext;
 using ::testing::Eq;
 using ::testing::HasSubstr;
 
-class ListTradesHandlerTest : public ::testing::Test {
+class ListHoldingsHandlerTest : public ::testing::Test {
  protected:
   void SetUp() override {
     db_ = pulse::UnwrapOrDie(Database::Open(":memory:"));
@@ -46,14 +46,16 @@ class ListTradesHandlerTest : public ::testing::Test {
     service_ = std::make_unique<TradeService>(&db_, trades_dao_.get(),
                                               holdings_dao_.get());
 
-    ServerContext<TradesDao*> ctx;
-    ctx.set(trades_dao_.get());
-    router_ = pulse::UnwrapOrDie(Router::Make<Routes<ListTradesHandler>>(ctx));
+    ServerContext<HoldingsDao*> ctx;
+    ctx.set(holdings_dao_.get());
+    router_ =
+        pulse::UnwrapOrDie(Router::Make<Routes<ListHoldingsHandler>>(ctx));
   }
 
   Response RunMethod(Request req) {
     return (
-        *router_.Match(ListTradesHandler::kMethod, ListTradesHandler::kPath)
+        *router_
+             .Match(ListHoldingsHandler::kMethod, ListHoldingsHandler::kPath)
              ->handler)(std::move(req));
   }
 
@@ -65,17 +67,17 @@ class ListTradesHandlerTest : public ::testing::Test {
   Router router_;
 };
 
-TEST_F(ListTradesHandlerTest, MissingNameParam) {
+TEST_F(ListHoldingsHandlerTest, MissingNameParam) {
   EXPECT_THAT(RunMethod(Request{}).status, Eq(400));
 }
 
-TEST_F(ListTradesHandlerTest, EmptyList) {
+TEST_F(ListHoldingsHandlerTest, EmptyList) {
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
   EXPECT_THAT(response.body, Eq("[]"));
 }
 
-TEST_F(ListTradesHandlerTest, ListsTrades) {
+TEST_F(ListHoldingsHandlerTest, ListsHoldings) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
@@ -84,11 +86,10 @@ TEST_F(ListTradesHandlerTest, ListsTrades) {
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
   EXPECT_THAT(response.body, HasSubstr(R"("ticker":"GOOG")"));
-  EXPECT_THAT(response.body, HasSubstr(R"("type":"BUY")"));
   EXPECT_THAT(response.body, HasSubstr(R"("account_name":"brokerage")"));
 }
 
-TEST_F(ListTradesHandlerTest, MultipleTrades) {
+TEST_F(ListHoldingsHandlerTest, MultipleHoldings) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
@@ -104,15 +105,19 @@ TEST_F(ListTradesHandlerTest, MultipleTrades) {
   EXPECT_THAT(response.body, HasSubstr(R"("ticker":"AAPL")"));
 }
 
-TEST_F(ListTradesHandlerTest, NullDescription) {
+TEST_F(ListHoldingsHandlerTest, SellToZeroNotListed) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
       /*description=*/std::nullopt));
+  pulse::DieIfError(service_->RecordTrade(
+      /*account_name=*/"brokerage", /*type=*/Trade::Type::kSell,
+      /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/160.0,
+      /*description=*/std::nullopt));
 
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
-  EXPECT_THAT(response.body, HasSubstr(R"("description":null)"));
+  EXPECT_THAT(response.body, Eq("[]"));
 }
 
 }  // namespace

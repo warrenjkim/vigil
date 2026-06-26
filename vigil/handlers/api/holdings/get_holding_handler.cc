@@ -1,4 +1,4 @@
-#include "vigil/handlers/get_holding_handler.h"
+#include "vigil/handlers/api/holdings/get_holding_handler.h"
 
 #include <string>
 #include <utility>

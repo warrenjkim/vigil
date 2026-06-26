@@ -1,4 +1,4 @@
-#include "vigil/handlers/health_handler.h"
+#include "vigil/handlers/pages/health_handler.h"
 
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"

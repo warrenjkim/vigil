@@ -1,4 +1,4 @@
-#include "vigil/handlers/list_trades_handler.h"
+#include "vigil/handlers/api/trades/list_trades_handler.h"
 
 #include <string>
 #include <utility>

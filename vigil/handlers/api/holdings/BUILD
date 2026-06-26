@@ -1,0 +1,81 @@
+cc_library(
+    name = "get_holding_handler",
+    srcs = ["get_holding_handler.cc"],
+    hdrs = ["get_holding_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:holding",
+        "//vigil/db:holdings_dao",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/json:value",
+    ],
+)
+
+cc_test(
+    name = "get_holding_handler_test",
+    srcs = ["get_holding_handler_test.cc"],
+    deps = [
+        ":get_holding_handler",
+        "//vigil:trade_service",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "//vigil/db:holdings_dao",
+        "//vigil/db:trade",
+        "//vigil/db:trades_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:result_or_die",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
+    ],
+)
+
+cc_library(
+    name = "list_holdings_handler",
+    srcs = ["list_holdings_handler.cc"],
+    hdrs = ["list_holdings_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:holding",
+        "//vigil/db:holdings_dao",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/json:value",
+    ],
+)
+
+cc_test(
+    name = "list_holdings_handler_test",
+    srcs = ["list_holdings_handler_test.cc"],
+    deps = [
+        ":list_holdings_handler",
+        "//vigil:trade_service",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "//vigil/db:holdings_dao",
+        "//vigil/db:trade",
+        "//vigil/db:trades_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:result_or_die",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
+    ],
+)

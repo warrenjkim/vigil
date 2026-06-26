@@ -1,4 +1,4 @@
-#include "vigil/handlers/list_transactions_handler.h"
+#include "vigil/handlers/api/transactions/list_transactions_handler.h"
 
 #include <cstddef>
 #include <string>

@@ -1,4 +1,4 @@
-#include "vigil/handlers/list_accounts_handler.h"
+#include "vigil/handlers/api/accounts/list_accounts_handler.h"
 
 #include <utility>
 #include <vector>
