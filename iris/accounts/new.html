@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>new account</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Computer Modern Sans", sans-serif;
+      }
+
+      body {
+        font-size: 18px;
+        line-height: 1.5;
+        color: #dddddd;
+        background-color: #151515;
+        padding: 4rem 6rem;
+      }
+
+      h1 {
+        font-size: 28px;
+        text-transform: uppercase;
+        font-weight: lighter;
+        color: #dddddd;
+        margin-bottom: 2rem;
+      }
+
+      label {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #a89984;
+        display: block;
+        margin-bottom: 0.25rem;
+        margin-top: 0.75rem;
+      }
+
+      input,
+      select {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        color: #dddddd;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.9rem;
+        display: block;
+        width: 280px;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #668373;
+      }
+
+      button {
+        margin-top: 1.5rem;
+        background: #1d2021;
+        border: 1px solid #98971a;
+        color: #98971a;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+
+      button:hover {
+        color: #b8bb26;
+        border-color: #b8bb26;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>new account</h1>
+    <form action="/accounts" method="post">
+      <label for="name">name</label>
+      <input type="text" id="name" name="name" placeholder="account name" />
+      <label for="type">type</label>
+      <select id="type" name="type">
+        <option value="CHECKING">CHECKING</option>
+        <option value="SAVINGS">SAVINGS</option>
+        <option value="BROKERAGE">BROKERAGE</option>
+        <option value="401K">401K</option>
+        <option value="ROTH_IRA">ROTH_IRA</option>
+        <option value="TRADITIONAL_IRA">TRADITIONAL_IRA</option>
+      </select>
+      <button type="submit">create</button>
+    </form>
+  </body>
+</html>
