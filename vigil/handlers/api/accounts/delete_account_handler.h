@@ -8,11 +8,11 @@
 
 namespace vigil {
 
-class DeleteAccountHandler final : public pulse::http::Handler {
+class DeleteAccountHandler final
+    : public pulse::http::Handler<pulse::http::Method::kDelete,
+                                  "/accounts/{name}",
+                                  pulse::http::Dependencies<AccountsDao*>> {
  public:
-  PULSE_HTTP_ROUTE("/accounts/{name}", pulse::http::Method::kDelete);
-  using Dependencies = pulse::http::Dependencies<AccountsDao*>;
-
   explicit DeleteAccountHandler(AccountsDao* dao) : dao_(*dao) {}
 
   pulse::http::Response operator()(

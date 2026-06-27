@@ -8,11 +8,10 @@
 
 namespace vigil {
 
-class CreateAccountHandler final : public pulse::http::Handler {
+class CreateAccountHandler final
+    : public pulse::http::Handler<pulse::http::Method::kPost, "/accounts",
+                                  pulse::http::Dependencies<AccountsDao*> > {
  public:
-  PULSE_HTTP_ROUTE("/accounts", pulse::http::Method::kPost);
-  using Dependencies = pulse::http::Dependencies<AccountsDao*>;
-
   explicit CreateAccountHandler(AccountsDao* dao) : dao_(*dao) {}
 
   pulse::http::Response operator()(

@@ -8,12 +8,11 @@
 
 namespace vigil {
 
-class GetHoldingHandler final : public pulse::http::Handler {
+class GetHoldingHandler final
+    : public pulse::http::Handler<pulse::http::Method::kGet,
+                                  "/accounts/{name}/holdings/{ticker}",
+                                  pulse::http::Dependencies<HoldingsDao*> > {
  public:
-  PULSE_HTTP_ROUTE("/accounts/{name}/holdings/{ticker}",
-                   pulse::http::Method::kGet);
-  using Dependencies = pulse::http::Dependencies<HoldingsDao*>;
-
   explicit GetHoldingHandler(HoldingsDao* dao) : dao_(*dao) {}
 
   pulse::http::Response operator()(

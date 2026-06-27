@@ -43,6 +43,7 @@ cc_library(
     hdrs = ["get_new_account_handler.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":static_handler",
         "//iris:accounts_new_html",
         "@pulse//pulse/http:method",
     ],
@@ -69,5 +70,6 @@ cc_library(
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
+        "@pulse//pulse/strings:string_literal",
     ],
 )

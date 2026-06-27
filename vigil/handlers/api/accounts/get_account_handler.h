@@ -9,12 +9,11 @@
 
 namespace vigil {
 
-class GetAccountHandler final : public pulse::http::Handler {
+class GetAccountHandler final
+    : public pulse::http::Handler<
+          pulse::http::Method::kGet, "/accounts/{name}",
+          pulse::http::Dependencies<AccountsDao*, TransactionsDao*> > {
  public:
-  PULSE_HTTP_ROUTE("/accounts/{name}", pulse::http::Method::kGet);
-  using Dependencies =
-      pulse::http::Dependencies<AccountsDao*, TransactionsDao*>;
-
   explicit GetAccountHandler(AccountsDao* accounts_dao,
                              TransactionsDao* transactions_dao)
       : accounts_dao_(*accounts_dao), transactions_dao_(*transactions_dao) {}
