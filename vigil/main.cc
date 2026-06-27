@@ -40,9 +40,12 @@ const char* GetFlag(int argc, char** argv, const char* flag,
   return default_value;
 }
 
+using StaticHandlers =
+    pulse::http::Routes<vigil::GetNewAccountHandler, vigil::IndexHandler,
+                        vigil::HealthHandler>;
+
 using AccountHandlers =
-    pulse::http::Routes<vigil::GetNewAccountHandler,
-                        vigil::CreateAccountHandler, vigil::GetAccountHandler,
+    pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
                         vigil::DeleteAccountHandler,
                         vigil::ListAccountsHandler>;
 
@@ -79,8 +82,8 @@ int main(int argc, char** argv) {
   pulse::http::Server server(
       pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
-              vigil::IndexHandler, vigil::HealthHandler, AccountHandlers,
-              TransactionHandlers, TradeHandlers, HoldingHandlers>>(ctx)),
+              StaticHandlers, AccountHandlers, TransactionHandlers,
+              TradeHandlers, HoldingHandlers>>(ctx)),
       {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
   server.Run();
 
