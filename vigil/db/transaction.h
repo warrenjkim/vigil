@@ -17,6 +17,7 @@ struct Transaction {
   PULSE_ENUM(Type, TRANSACTION_TYPE_TABLE);
 
   int id;
+  std::string external_id;
   std::string account_name;
   Type type;
   double amount;

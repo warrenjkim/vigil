@@ -8,13 +8,14 @@
 
 namespace vigil {
 
-#define ACCOUNT_TYPE_TABLE(X) \
-  X(kChecking, "CHECKING")    \
-  X(kSavings, "SAVINGS")      \
-  X(kBrokerage, "BROKERAGE")  \
-  X(k401k, "401K")            \
-  X(kRothIra, "ROTH_IRA")     \
-  X(kTraditionalIra, "TRADITIONAL_IRA")
+#define ACCOUNT_TYPE_TABLE(X)           \
+  X(kChecking, "CHECKING")              \
+  X(kSavings, "SAVINGS")                \
+  X(kBrokerage, "BROKERAGE")            \
+  X(k401k, "401K")                      \
+  X(kRothIra, "ROTH_IRA")               \
+  X(kTraditionalIra, "TRADITIONAL_IRA") \
+  X(kCreditCard, "CREDIT_CARD")
 
 struct Account {
   PULSE_ENUM(Type, ACCOUNT_TYPE_TABLE);
