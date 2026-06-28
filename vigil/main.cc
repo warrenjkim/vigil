@@ -19,7 +19,6 @@
 #include "vigil/handlers/api/holdings/list_holdings_handler.h"
 #include "vigil/handlers/api/trades/create_trade_handler.h"
 #include "vigil/handlers/api/trades/list_trades_handler.h"
-#include "vigil/handlers/api/transactions/create_transaction_handler.h"
 #include "vigil/handlers/api/transactions/list_transactions_handler.h"
 #include "vigil/handlers/pages/dashboard_handler.h"
 #include "vigil/handlers/pages/get_new_account_handler.h"
@@ -50,8 +49,7 @@ using AccountHandlers =
                         vigil::DeleteAccountHandler,
                         vigil::ListAccountsHandler>;
 
-using TransactionHandlers = pulse::http::Routes<vigil::CreateTransactionHandler,
-                                                vigil::ListTransactionsHandler>;
+using TransactionHandlers = pulse::http::Routes<vigil::ListTransactionsHandler>;
 
 using TradeHandlers =
     pulse::http::Routes<vigil::CreateTradeHandler, vigil::ListTradesHandler>;

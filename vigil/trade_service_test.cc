@@ -13,6 +13,7 @@
 #include "vigil/db/database.h"
 #include "vigil/db/holding.h"
 #include "vigil/db/holdings_dao.h"
+#include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/db/trades_dao.h"
 
@@ -30,7 +31,8 @@ class TradeServiceTest : public ::testing::Test {
 
     accounts_dao_.emplace(db_);
     pulse::DieIfError(
-        accounts_dao_->CreateAccount("brokerage", Account::Type::kBrokerage));
+        accounts_dao_->CreateAccount(/*name=*/"brokerage",
+                                     /*type=*/Account::Type::kBrokerage));
 
     holdings_dao_.emplace(db_);
     trades_dao_.emplace(db_);
@@ -49,16 +51,17 @@ TEST_F(TradeServiceTest, BuyCreatesHolding) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<Holding> holding =
       holdings_dao_->GetHolding(/*account_name=*/"brokerage",
                                 /*ticker=*/"GOOG");
   ASSERT_TRUE(holding.ok());
-  EXPECT_THAT(holding->shares, Eq(10.0));
+  EXPECT_THAT(holding->shares, Eq(10));
 }
 
 TEST_F(TradeServiceTest, BuyAddsToExistingHolding) {
@@ -66,24 +69,26 @@ TEST_F(TradeServiceTest, BuyAddsToExistingHolding) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(service_
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/5.0,
-                                /*price=*/155.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/5,
+                                /*price=*/155,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<Holding> holding =
       holdings_dao_->GetHolding(/*account_name=*/"brokerage",
                                 /*ticker=*/"GOOG");
   ASSERT_TRUE(holding.ok());
-  EXPECT_THAT(holding->shares, Eq(15.0));
+  EXPECT_THAT(holding->shares, Eq(15));
 }
 
 TEST_F(TradeServiceTest, BuyCreatesTrade) {
@@ -91,9 +96,10 @@ TEST_F(TradeServiceTest, BuyCreatesTrade) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<std::vector<Trade>> trades =
@@ -102,8 +108,8 @@ TEST_F(TradeServiceTest, BuyCreatesTrade) {
   ASSERT_THAT(trades->size(), Eq(1));
   EXPECT_THAT((*trades)[0].type, Eq(Trade::Type::kBuy));
   EXPECT_THAT((*trades)[0].ticker, Eq("GOOG"));
-  EXPECT_THAT((*trades)[0].shares, Eq(10.0));
-  EXPECT_THAT((*trades)[0].price, Eq(150.0));
+  EXPECT_THAT((*trades)[0].shares, Eq(10));
+  EXPECT_THAT((*trades)[0].price, Eq(150));
 }
 
 TEST_F(TradeServiceTest, SellReducesHolding) {
@@ -111,24 +117,26 @@ TEST_F(TradeServiceTest, SellReducesHolding) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(service_
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kSell,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/3.0,
-                                /*price=*/160.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/3,
+                                /*price=*/160,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<Holding> holding =
       holdings_dao_->GetHolding(/*account_name=*/"brokerage",
                                 /*ticker=*/"GOOG");
   ASSERT_TRUE(holding.ok());
-  EXPECT_THAT(holding->shares, Eq(7.0));
+  EXPECT_THAT(holding->shares, Eq(7));
 }
 
 TEST_F(TradeServiceTest, SellToZeroDeletesHolding) {
@@ -136,17 +144,19 @@ TEST_F(TradeServiceTest, SellToZeroDeletesHolding) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(service_
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kSell,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/160.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/160,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<Holding> holding =
@@ -161,9 +171,10 @@ TEST_F(TradeServiceTest, SellWithNoPositionFails) {
       service_->RecordTrade(/*account_name=*/"brokerage",
                             /*type=*/Trade::Type::kSell,
                             /*ticker=*/"GOOG",
-                            /*shares=*/10.0,
-                            /*price=*/150.0,
-                            /*description=*/std::nullopt);
+                            /*shares=*/10,
+                            /*price=*/150,
+                            /*description=*/std::nullopt,
+                            /*trade_timestamp=*/Time::FromUnixSeconds(0));
   EXPECT_FALSE(result.ok());
   EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kFailedPrecondition));
 }
@@ -173,18 +184,20 @@ TEST_F(TradeServiceTest, SellInsufficientSharesFails) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<void> result =
       service_->RecordTrade(/*account_name=*/"brokerage",
                             /*type=*/Trade::Type::kSell,
                             /*ticker=*/"GOOG",
-                            /*shares=*/15.0,
-                            /*price=*/160.0,
-                            /*description=*/std::nullopt);
+                            /*shares=*/15,
+                            /*price=*/160,
+                            /*description=*/std::nullopt,
+                            /*trade_timestamp=*/Time::FromUnixSeconds(0));
   EXPECT_FALSE(result.ok());
   EXPECT_THAT(result.error().code, Eq(pulse::Error::Code::kFailedPrecondition));
 }
@@ -194,9 +207,10 @@ TEST_F(TradeServiceTest, FailureRollsBackTrade) {
       service_->RecordTrade(/*account_name=*/"brokerage",
                             /*type=*/Trade::Type::kSell,
                             /*ticker=*/"GOOG",
-                            /*shares=*/10.0,
-                            /*price=*/150.0,
-                            /*description=*/std::nullopt);
+                            /*shares=*/10,
+                            /*price=*/150,
+                            /*description=*/std::nullopt,
+                            /*trade_timestamp=*/Time::FromUnixSeconds(0));
   EXPECT_FALSE(result.ok());
 
   pulse::Result<std::vector<Trade>> trades =
@@ -210,9 +224,10 @@ TEST_F(TradeServiceTest, NonexistentAccountFails) {
       service_->RecordTrade(/*account_name=*/"nonexistent",
                             /*type=*/Trade::Type::kBuy,
                             /*ticker=*/"GOOG",
-                            /*shares=*/10.0,
-                            /*price=*/150.0,
-                            /*description=*/std::nullopt);
+                            /*shares=*/10,
+                            /*price=*/150,
+                            /*description=*/std::nullopt,
+                            /*trade_timestamp=*/Time::FromUnixSeconds(0));
   EXPECT_FALSE(result.ok());
 }
 
@@ -221,29 +236,31 @@ TEST_F(TradeServiceTest, MultipleTickers) {
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"GOOG",
-                                /*shares=*/10.0,
-                                /*price=*/150.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/10,
+                                /*price=*/150,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(service_
                   ->RecordTrade(/*account_name=*/"brokerage",
                                 /*type=*/Trade::Type::kBuy,
                                 /*ticker=*/"AAPL",
-                                /*shares=*/5.0,
-                                /*price=*/200.0,
-                                /*description=*/std::nullopt)
+                                /*shares=*/5,
+                                /*price=*/200,
+                                /*description=*/std::nullopt,
+                                /*trade_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   EXPECT_THAT(holdings_dao_
                   ->GetHolding(/*account_name=*/"brokerage",
                                /*ticker=*/"GOOG")
                   ->shares,
-              Eq(10.0));
+              Eq(10));
   EXPECT_THAT(holdings_dao_
                   ->GetHolding(/*account_name=*/"brokerage",
                                /*ticker=*/"AAPL")
                   ->shares,
-              Eq(5.0));
+              Eq(5));
 }
 
 }  // namespace

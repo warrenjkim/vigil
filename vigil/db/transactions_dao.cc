@@ -1,7 +1,6 @@
 #include "vigil/db/transactions_dao.h"
 
 #include <cstdint>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -19,29 +18,33 @@ TransactionsDao::TransactionsDao(Database db) : db_(db) {}
 
 pulse::Result<void> TransactionsDao::CreateTransaction(
     std::string_view account_name, Transaction::Type type, double amount,
-    std::optional<std::string_view> description) {
+    std::string_view merchant, Time transaction_timestamp) {
   return db_.Execute(
       R"sql(
         INSERT INTO Transactions (
           AccountId,
           Type,
           Amount,
-          Description,
-          Timestamp
+          Merchant,
+          TransactionTimestamp,
+          CommitTimestamp
         )
         VALUES (
           (SELECT Id FROM Accounts WHERE Name = :account_name),
           :type,
           :amount,
-          :description,
-          :timestamp
+          :merchant,
+          :transaction_timestamp,
+          :commit_timestamp
         )
       )sql",
-      /*parameters=*/{{":account_name", account_name},
-                      {":type", pulse::ToString(type)},
-                      {":amount", amount},
-                      {":description", description},
-                      {":timestamp", Time::Now().ToUnixSeconds()}});
+      /*parameters=*/{
+          {":account_name", account_name},
+          {":type", pulse::ToString(type)},
+          {":amount", amount},
+          {":merchant", merchant},
+          {":transaction_timestamp", transaction_timestamp.ToUnixSeconds()},
+          {":commit_timestamp", Time::Now().ToUnixSeconds()}});
 }
 
 pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
@@ -54,8 +57,8 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
               a.Name,
               t.Type,
               t.Amount,
-              t.Description,
-              t.Timestamp
+              t.Merchant,
+              t.TransactionTimestamp
             FROM
               Transactions AS t
             JOIN
@@ -66,15 +69,16 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
           )sql",
           /*parameters=*/{{":account_name", account_name}},
           [&transactions](int id, std::string account_name, std::string type,
-                          double amount, std::optional<std::string> description,
-                          int64_t timestamp) {
+                          double amount, std::string merchant,
+                          int64_t transaction_timestamp) {
             transactions.push_back(
                 Transaction{.id = id,
                             .account_name = std::move(account_name),
                             .type = ToTransferType(type),
                             .amount = amount,
-                            .description = std::move(description),
-                            .timestamp = Time::FromUnixSeconds(timestamp)});
+                            .merchant = std::move(merchant),
+                            .transaction_timestamp =
+                                Time::FromUnixSeconds(transaction_timestamp)});
           });
       !err.ok()) {
     return err.error();

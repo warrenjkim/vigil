@@ -1,7 +1,6 @@
 #include "vigil/handlers/api/transactions/list_transactions_handler.h"
 
 #include <memory>
-#include <optional>
 #include <utility>
 
 #include "gmock/gmock.h"
@@ -14,6 +13,7 @@
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
+#include "vigil/db/time.h"
 #include "vigil/db/transaction.h"
 #include "vigil/db/transactions_dao.h"
 
@@ -72,7 +72,8 @@ TEST_F(ListTransactionsHandlerTest, EmptyList) {
 
 TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
+      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));
@@ -81,29 +82,24 @@ TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
   EXPECT_THAT(response.body, HasSubstr(R"("account_name":"checking")"));
 }
 
-TEST_F(ListTransactionsHandlerTest, NullDescription) {
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
-
-  Response response = RunMethod(Request{.path = {{"name", "checking"}}});
-  EXPECT_THAT(response.status, Eq(200));
-  EXPECT_THAT(response.body, HasSubstr(R"("description":null)"));
-}
-
 TEST_F(ListTransactionsHandlerTest, WithDescription) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100.0, "paycheck"));
+      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"paycheck",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));
-  EXPECT_THAT(response.body, HasSubstr(R"("description":"paycheck")"));
+  EXPECT_THAT(response.body, HasSubstr(R"("merchant":"paycheck")"));
 }
 
 TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
+      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kWithdrawal, 50.0, std::nullopt));
+      "checking", Transaction::Type::kWithdrawal, 50,
+      /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));
@@ -115,9 +111,13 @@ TEST_F(ListTransactionsHandlerTest, IsolatedByAccount) {
   pulse::DieIfError(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "savings", Transaction::Type::kDeposit, 999.0, std::nullopt));
+      "savings", Transaction::Type::kDeposit, 999,
+      /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100.0, std::nullopt));
+      "checking", Transaction::Type::kDeposit, 100,
+      /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));

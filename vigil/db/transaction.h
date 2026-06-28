@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <string>
 
 #include "pulse/core/enum_macros.h"
@@ -21,8 +20,8 @@ struct Transaction {
   std::string account_name;
   Type type;
   double amount;
-  std::optional<std::string> description;
-  Time timestamp;
+  std::string merchant;
+  Time transaction_timestamp;
 
   friend bool operator==(const Transaction&, const Transaction&) = default;
 };
@@ -38,8 +37,7 @@ struct pulse::Stringify<vigil::Transaction> {
   static std::string ToString(const vigil::Transaction& t) {
     return pulse::strings::Cat(
         "Transaction{.id=", t.id, ",.account_name=", t.account_name,
-        ",.type=", t.type, ",.amount=", t.amount, ",.description=",
-        t.description.has_value() ? *t.description : "std::nullopt",
-        ",.timestamp=", t.timestamp, "}");
+        ",.type=", t.type, ",.amount=", t.amount, ",.merchant=", t.merchant,
+        ",.timestamp=", t.transaction_timestamp, "}");
   }
 };

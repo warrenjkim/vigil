@@ -19,7 +19,8 @@ TradesDao::TradesDao(Database db) : db_(db) {}
 
 pulse::Result<void> TradesDao::CreateTrade(
     std::string_view account_name, Trade::Type type, std::string_view ticker,
-    double shares, double price, std::optional<std::string_view> description) {
+    double shares, double price, std::optional<std::string_view> description,
+    Time trade_timestamp) {
   return db_.Execute(
       R"sql(
         INSERT INTO Trades (
@@ -29,7 +30,8 @@ pulse::Result<void> TradesDao::CreateTrade(
           Shares,
           Price,
           Description,
-          Timestamp
+          TradeTimestamp,
+          CommitTimestamp
         )
         VALUES (
           (SELECT Id FROM Accounts WHERE Name = :account_name),
@@ -38,7 +40,8 @@ pulse::Result<void> TradesDao::CreateTrade(
           :shares,
           :price,
           :description,
-          :timestamp
+          :trade_timestamp,
+          :commit_timestamp
         )
       )sql",
       /*parameters=*/{{":account_name", account_name},
@@ -47,7 +50,8 @@ pulse::Result<void> TradesDao::CreateTrade(
                       {":shares", shares},
                       {":price", price},
                       {":description", description},
-                      {":timestamp", Time::Now().ToUnixSeconds()}});
+                      {":trade_timestamp", trade_timestamp.ToUnixSeconds()},
+                      {":commit_timestamp", Time::Now().ToUnixSeconds()}});
 }
 
 pulse::Result<std::vector<Trade>> TradesDao::ListTrades(
@@ -63,7 +67,7 @@ pulse::Result<std::vector<Trade>> TradesDao::ListTrades(
               t.Shares,
               t.Price,
               t.Description,
-              t.Timestamp
+              t.TradeTimestamp
             FROM
               Trades AS t
             JOIN Accounts AS a
@@ -74,16 +78,17 @@ pulse::Result<std::vector<Trade>> TradesDao::ListTrades(
           /*parameters=*/{{":account_name", account_name}},
           [&trades](int id, std::string account_name, std::string type,
                     std::string ticker, double shares, double price,
-                    std::optional<std::string> description, int64_t timestamp) {
-            trades.push_back(
-                Trade{.id = id,
-                      .account_name = std::move(account_name),
-                      .type = to_trade_type(type),
-                      .ticker = std::move(ticker),
-                      .shares = shares,
-                      .price = price,
-                      .description = std::move(description),
-                      .timestamp = Time::FromUnixSeconds(timestamp)});
+                    std::optional<std::string> description,
+                    int64_t trade_timestamp) {
+            trades.push_back(Trade{
+                .id = id,
+                .account_name = std::move(account_name),
+                .type = to_trade_type(type),
+                .ticker = std::move(ticker),
+                .shares = shares,
+                .price = price,
+                .description = std::move(description),
+                .trade_timestamp = Time::FromUnixSeconds(trade_timestamp)});
           });
       !err.ok()) {
     return err.error();

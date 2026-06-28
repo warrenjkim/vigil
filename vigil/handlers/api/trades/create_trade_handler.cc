@@ -1,5 +1,6 @@
 #include "vigil/handlers/api/trades/create_trade_handler.h"
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <utility>
@@ -12,6 +13,7 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
+#include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/trade_service.h"
 
@@ -25,6 +27,7 @@ struct CreateTradeRequest {
   double shares;
   double price;
   std::optional<std::string> description;
+  int64_t trade_timestamp;
 
   static constexpr auto schema() {
     return pulse::json::Schema<CreateTradeRequest>{}
@@ -32,7 +35,8 @@ struct CreateTradeRequest {
         .Field("ticker", &CreateTradeRequest::ticker)
         .Field("shares", &CreateTradeRequest::shares)
         .Field("price", &CreateTradeRequest::price)
-        .Field("description", &CreateTradeRequest::description);
+        .Field("description", &CreateTradeRequest::description)
+        .Field("trade_timestamp", &CreateTradeRequest::trade_timestamp);
   }
 };
 
@@ -78,9 +82,9 @@ pulse::http::Response CreateTradeHandler::operator()(
                << "', shares=" << req->shares << ", price=" << req->price
                << ")";
 
-  if (pulse::Result<void> result =
-          service_.RecordTrade(*account_name, trade_type, req->ticker,
-                               req->shares, req->price, req->description);
+  if (pulse::Result<void> result = service_.RecordTrade(
+          *account_name, trade_type, req->ticker, req->shares, req->price,
+          req->description, Time::FromUnixSeconds(req->trade_timestamp));
       !result.ok()) {
     pulse::Log() << "CreateTrade: record failed: " << result.error().message;
     if (result.error().code == pulse::Error::Code::kFailedPrecondition) {

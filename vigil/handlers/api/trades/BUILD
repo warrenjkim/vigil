@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//vigil:trade_service",
+        "//vigil/db:time",
         "//vigil/db:trade",
         "@pulse//pulse/core:error",
         "@pulse//pulse/core:log",
@@ -69,6 +70,7 @@ cc_test(
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
         "//vigil/db:holdings_dao",
+        "//vigil/db:time",
         "//vigil/db:trade",
         "//vigil/db:trades_dao",
         "@googletest//:gtest",

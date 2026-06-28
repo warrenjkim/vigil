@@ -45,16 +45,15 @@ pulse::http::Response ListTransactionsHandler::operator()(
 
   pulse::json::Array response_body;
   response_body.reserve(transactions->size());
-  for (auto& [transaction_id, account_name, type, amount, description,
+  for (auto& [transaction_id, external_id, account_name, type, amount, merchant,
               timestamp] : *transactions) {
-    response_body.push_back(pulse::json::Object{
-        {"id", transaction_id},
-        {"account_name", std::move(account_name)},
-        {"type", pulse::ToString(type)},
-        {"amount", amount},
-        {"description", description.has_value() ? *std::move(description)
-                                                : pulse::json::Value{nullptr}},
-        {"timestamp", pulse::ToString(timestamp)}});
+    response_body.push_back(
+        pulse::json::Object{{"id", transaction_id},
+                            {"account_name", std::move(account_name)},
+                            {"type", pulse::ToString(type)},
+                            {"amount", amount},
+                            {"merchant", std::move(merchant)},
+                            {"timestamp", pulse::ToString(timestamp)}});
   }
 
   return pulse::http::Response{.content_type = "application/json",

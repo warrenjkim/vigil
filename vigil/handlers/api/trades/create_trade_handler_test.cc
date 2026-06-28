@@ -1,6 +1,7 @@
 #include "vigil/handlers/api/trades/create_trade_handler.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "gmock/gmock.h"
@@ -27,6 +28,7 @@ using ::pulse::http::Router;
 using ::pulse::http::Routes;
 using ::pulse::http::ServerContext;
 using ::testing::Eq;
+using ::testing::ValuesIn;
 
 class CreateTradeHandlerTest : public ::testing::Test {
  protected:
@@ -68,107 +70,118 @@ TEST_F(CreateTradeHandlerTest, CreateTrade) {
             "type": "BUY",
             "ticker": "GOOG",
             "shares": 10.0,
-            "price": 150.0
+            "price": 150.0,
+            "trade_timestamp": 100
           })"}),
       Eq(Response{
           .content_type = "text/plain", .status = 201, .body = "Created"}));
 }
 
-TEST_F(CreateTradeHandlerTest, MissingNameParam) {
-  EXPECT_THAT(RunMethod(Request{.body = R"({
-            "type": "BUY",
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(400));
+struct CreateTradeHandlerParam {
+  std::string test_name;
+  Request request;
+  int expected_status;
+};
+
+class CreateTradeHandlerParamTest
+    : public CreateTradeHandlerTest,
+      public ::testing::WithParamInterface<CreateTradeHandlerParam> {};
+
+TEST_P(CreateTradeHandlerParamTest, ReturnsExpectedStatus) {
+  EXPECT_THAT(RunMethod(GetParam().request).status,
+              Eq(GetParam().expected_status));
 }
 
-TEST_F(CreateTradeHandlerTest, MissingType) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(400));
-}
-
-TEST_F(CreateTradeHandlerTest, MissingTicker) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "BUY",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(400));
-}
-
-TEST_F(CreateTradeHandlerTest, MissingShares) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "BUY",
-            "ticker": "GOOG",
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(400));
-}
-
-TEST_F(CreateTradeHandlerTest, MissingPrice) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "BUY",
-            "ticker": "GOOG",
-            "shares": 10.0
-          })"})
-                  .status,
-              Eq(400));
-}
-
-TEST_F(CreateTradeHandlerTest, UnrecognizedType) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "bad_type",
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(400));
-}
-
-TEST_F(CreateTradeHandlerTest, SellWithNoPosition) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "SELL",
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(422));
-}
-
-TEST_F(CreateTradeHandlerTest, NonexistentAccount) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "nonexistent"}}, .body = R"({
-            "type": "BUY",
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0
-          })"})
-                  .status,
-              Eq(500));
-}
-
-TEST_F(CreateTradeHandlerTest, WithDescription) {
-  EXPECT_THAT(RunMethod(Request{.path = {{"name", "brokerage"}}, .body = R"({
-            "type": "BUY",
-            "ticker": "GOOG",
-            "shares": 10.0,
-            "price": 150.0,
-            "description": "initial position"
-          })"})
-                  .status,
-              Eq(201));
-}
+INSTANTIATE_TEST_SUITE_P(
+    CreateTradeHandlerTests, CreateTradeHandlerParamTest,
+    ValuesIn<CreateTradeHandlerParam>(
+        {{.test_name = "MissingNameParam",
+          .request = Request{.body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "MissingType",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "MissingTicker",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "BUY",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "MissingShares",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "MissingPrice",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "MissingTradeTimestamp",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+            })"},
+          .expected_status = 400},
+         {.test_name = "UnrecognizedType",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "bad_type",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 400},
+         {.test_name = "SellWithNoPosition",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "SELL",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 422},
+         {.test_name = "NonexistentAccount",
+          .request = Request{.path = {{"name", "nonexistent"}}, .body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 500},
+         {.test_name = "WithDescription",
+          .request = Request{.path = {{"name", "brokerage"}}, .body = R"({
+              "type": "BUY",
+              "ticker": "GOOG",
+              "shares": 10.0,
+              "price": 150.0,
+              "description": "initial position",
+              "trade_timestamp": 100
+            })"},
+          .expected_status = 201}}),
+    [](const auto& info) { return info.param.test_name; });
 
 }  // namespace
 

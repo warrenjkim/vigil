@@ -13,6 +13,7 @@
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
+#include "vigil/db/time.h"
 #include "vigil/db/transaction.h"
 #include "vigil/db/transactions_dao.h"
 
@@ -87,10 +88,12 @@ TEST_F(GetAccountHandlerTest, GetAccountWithBalance) {
       accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", Transaction::Type::kDeposit,
-      /*amount=*/1000.0));
+      /*amount=*/1000, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", Transaction::Type::kWithdrawal,
-      /*amount=*/250.0));
+      /*amount=*/250, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));

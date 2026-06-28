@@ -103,6 +103,7 @@ cc_test(
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
+        "//vigil/db:time",
         "//vigil/db:transaction",
         "//vigil/db:transactions_dao",
         "@googletest//:gtest",

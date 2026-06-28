@@ -10,7 +10,6 @@ cc_library(
         "//vigil/handlers/api/holdings:list_holdings_handler",
         "//vigil/handlers/api/trades:create_trade_handler",
         "//vigil/handlers/api/trades:list_trades_handler",
-        "//vigil/handlers/api/transactions:create_transaction_handler",
         "//vigil/handlers/api/transactions:list_transactions_handler",
     ],
 )

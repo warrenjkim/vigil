@@ -11,6 +11,7 @@
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
+#include "vigil/db/time.h"
 #include "vigil/db/transaction.h"
 
 namespace vigil {
@@ -45,10 +46,11 @@ class TransactionsDaoTest : public ::testing::Test {
 };
 
 TEST_F(TransactionsDaoTest, CreateAndList) {
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0,
-                                      /*description=*/std::nullopt)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<std::vector<Transaction>> result =
@@ -57,23 +59,22 @@ TEST_F(TransactionsDaoTest, CreateAndList) {
   ASSERT_THAT(*result, SizeIs(1));
   EXPECT_THAT((*result)[0].account_name, StrEq("checking"));
   EXPECT_THAT((*result)[0].type, Eq(Transaction::Type::kDeposit));
-  EXPECT_THAT((*result)[0].amount, Eq(100.0));
-  EXPECT_FALSE((*result)[0].description.has_value());
+  EXPECT_THAT((*result)[0].amount, Eq(100));
 }
 
 TEST_F(TransactionsDaoTest, CreateWithDescription) {
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0,
-                                      /*description=*/"initial deposit")
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100,
+                      /*merchant=*/"initial deposit",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<std::vector<Transaction>> result =
       dao_->ListTransactions(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok()) << result.error().message;
   ASSERT_THAT(*result, SizeIs(1));
-  ASSERT_TRUE((*result)[0].description.has_value());
-  EXPECT_THAT(*(*result)[0].description, StrEq("initial deposit"));
+  EXPECT_THAT((*result)[0].merchant, StrEq("initial deposit"));
 }
 
 TEST_F(TransactionsDaoTest, ListEmptyTransactions) {
@@ -84,15 +85,18 @@ TEST_F(TransactionsDaoTest, ListEmptyTransactions) {
 }
 
 TEST_F(TransactionsDaoTest, ListMultipleTransactions) {
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0,
-                                      /*description=*/std::nullopt)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kWithdrawal,
-                                      /*amount=*/50.0,
-                                      /*description=*/std::nullopt)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking",
+                      Transaction::Type::kWithdrawal,
+                      /*amount=*/50,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<std::vector<Transaction>> result =
@@ -105,84 +109,96 @@ TEST_F(TransactionsDaoTest, ListTransactionsIsolatedByAccount) {
   ASSERT_TRUE(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings).ok());
 
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0,
-                                      /*description=*/std::nullopt)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"savings",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/200.0,
-                                      /*description=*/std::nullopt)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"savings", Transaction::Type::kDeposit,
+                      /*amount=*/200,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<std::vector<Transaction>> result =
       dao_->ListTransactions(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok()) << result.error().message;
   ASSERT_THAT(*result, SizeIs(1));
-  EXPECT_THAT((*result)[0].amount, Eq(100.0));
+  EXPECT_THAT((*result)[0].amount, Eq(100));
 }
 
 TEST_F(TransactionsDaoTest, CreateForNonexistentAccount) {
   pulse::Result<void> result = dao_->CreateTransaction(
       /*account_name=*/"nonexistent", Transaction::Type::kDeposit,
-      /*amount=*/100.0,
-      /*description=*/std::nullopt);
+      /*amount=*/100,
+      /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0));
   EXPECT_FALSE(result.ok());
 }
 
 TEST_F(TransactionsDaoTest, GetBalanceSingleDeposit) {
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok());
-  EXPECT_THAT(*result, Eq(100.0));
+  EXPECT_THAT(*result, Eq(100));
 }
 
 TEST_F(TransactionsDaoTest, GetBalanceDepositsAndWithdrawals) {
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/1000.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/1000,
+                      /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kWithdrawal,
-                                      /*amount=*/250.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking",
+                      Transaction::Type::kWithdrawal,
+                      /*amount=*/250, /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/500.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/500, /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok());
-  EXPECT_THAT(*result, Eq(1250.0));
+  EXPECT_THAT(*result, Eq(1250));
 }
 
 TEST_F(TransactionsDaoTest, GetBalanceIsolatedByAccount) {
   ASSERT_TRUE(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings).ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"checking",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/100.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"checking", Transaction::Type::kDeposit,
+                      /*amount=*/100, /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-  ASSERT_TRUE(dao_->CreateTransaction(/*account_name=*/"savings",
-                                      Transaction::Type::kDeposit,
-                                      /*amount=*/999.0)
+  ASSERT_TRUE(dao_->CreateTransaction(
+                      /*account_name=*/"savings", Transaction::Type::kDeposit,
+                      /*amount=*/999, /*merchant=*/"",
+                      /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
   pulse::Result<double> result = dao_->GetBalance(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok());
-  EXPECT_THAT(*result, Eq(100.0));
+  EXPECT_THAT(*result, Eq(100));
 }
 
 TEST_F(TransactionsDaoTest, GetBalanceNonexistentAccount) {
   pulse::Result<double> result =
       dao_->GetBalance(/*account_name=*/"nonexistent");
   ASSERT_TRUE(result.ok());
-  EXPECT_THAT(*result, Eq(0.0));
+  EXPECT_THAT(*result, Eq(0));
 }
 
 }  // namespace

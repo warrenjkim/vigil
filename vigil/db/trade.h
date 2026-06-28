@@ -24,7 +24,7 @@ struct Trade {
   double shares;
   double price;
   std::optional<std::string> description;
-  Time timestamp;
+  Time trade_timestamp;
 
   friend bool operator==(const Trade&, const Trade&) = default;
 };
@@ -43,6 +43,6 @@ struct pulse::Stringify<vigil::Trade> {
         ",.type=", t.type, ",.ticker=", t.ticker, ",.shares=", t.shares,
         ",.price=", t.price, ",.description=",
         t.description.has_value() ? *t.description : "std::nullopt",
-        ",.timestamp=", t.timestamp, "}");
+        ",.trade_timestamp=", t.trade_timestamp, "}");
   }
 };

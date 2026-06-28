@@ -10,6 +10,7 @@
 #include "vigil/db/database.h"
 #include "vigil/db/holding.h"
 #include "vigil/db/holdings_dao.h"
+#include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/db/trades_dao.h"
 
@@ -21,13 +22,15 @@ TradeService::TradeService(Database* db, TradesDao* trades_dao,
 
 pulse::Result<void> TradeService::RecordTrade(
     std::string_view account_name, Trade::Type type, std::string_view ticker,
-    double shares, double price, std::optional<std::string_view> description) {
+    double shares, double price, std::optional<std::string_view> description,
+    Time trade_timestamp) {
   return WrapInTransaction(
       &db_,
-      [this, account_name, type, ticker, shares, price,
-       description]() -> pulse::Result<void> {
-        if (pulse::Result<void> err = trades_dao_.CreateTrade(
-                account_name, type, ticker, shares, price, description);
+      [this, account_name, type, ticker, shares, price, description,
+       trade_timestamp]() -> pulse::Result<void> {
+        if (pulse::Result<void> err =
+                trades_dao_.CreateTrade(account_name, type, ticker, shares,
+                                        price, description, trade_timestamp);
             !err.ok()) {
           return err.error();
         }

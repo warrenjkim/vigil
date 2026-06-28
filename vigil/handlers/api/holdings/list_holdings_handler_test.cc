@@ -15,6 +15,7 @@
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
 #include "vigil/db/holdings_dao.h"
+#include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/db/trades_dao.h"
 #include "vigil/trade_service.h"
@@ -81,7 +82,8 @@ TEST_F(ListHoldingsHandlerTest, ListsHoldings) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
-      /*description=*/std::nullopt));
+      /*description=*/std::nullopt,
+      /*trade_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
@@ -93,11 +95,13 @@ TEST_F(ListHoldingsHandlerTest, MultipleHoldings) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
-      /*description=*/std::nullopt));
+      /*description=*/std::nullopt,
+      /*trade_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"AAPL", /*shares=*/5.0, /*price=*/200.0,
-      /*description=*/std::nullopt));
+      /*description=*/std::nullopt,
+      /*trade_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
@@ -109,11 +113,13 @@ TEST_F(ListHoldingsHandlerTest, SellToZeroNotListed) {
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kBuy,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/150.0,
-      /*description=*/std::nullopt));
+      /*description=*/std::nullopt,
+      /*trade_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(service_->RecordTrade(
       /*account_name=*/"brokerage", /*type=*/Trade::Type::kSell,
       /*ticker=*/"GOOG", /*shares=*/10.0, /*price=*/160.0,
-      /*description=*/std::nullopt));
+      /*description=*/std::nullopt,
+      /*trade_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "brokerage"}}});
   EXPECT_THAT(response.status, Eq(200));
