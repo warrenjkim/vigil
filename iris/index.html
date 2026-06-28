@@ -85,6 +85,28 @@
         align-items: center;
       }
 
+      .nav {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .nav a {
+        color: #665c54;
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        color: #a89984;
+      }
+
+      .nav a.active {
+        color: #8bb39d;
+      }
+
       input {
         background: #1d2021;
         border: 1px solid #3c3836;
@@ -174,6 +196,10 @@
     </style>
   </head>
   <body>
+    <nav class="nav">
+      <a href="/" class="active">console</a>
+      <a href="/dashboard">dashboard</a>
+    </nav>
     <h1>iris // dev console</h1>
     <hr />
 
@@ -390,7 +416,7 @@
     </div>
 
     <script>
-      const BASE = "http://localhost:8080";
+      const BASE = "";
       const out = document.getElementById("out");
 
       function val(id) {

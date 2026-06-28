@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Iris // Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Computer Modern Sans", sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #dddddd;
+        background-color: #151515;
+        padding: 4rem 6rem;
+      }
+
+      h1 {
+        font-size: 28px;
+        text-transform: uppercase;
+        font-weight: lighter;
+        letter-spacing: 0.1em;
+        color: #dddddd;
+        margin-bottom: 0.25rem;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #665c54;
+        margin-bottom: 1.75rem;
+      }
+
+      hr {
+        border: none;
+        height: 0.1em;
+        background-color: #50665a;
+        margin-bottom: 1.5rem;
+      }
+
+      .section-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #8bb39d;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #3c3836;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .metric {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        padding: 1rem 1.25rem;
+      }
+
+      .metric .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #665c54;
+        margin-bottom: 0.4rem;
+      }
+
+      .metric .value {
+        font-size: 22px;
+        font-family: "Computer Modern Typewriter", monospace;
+        color: #ebdbb2;
+      }
+
+      .metric .value.cash {
+        color: #98971a;
+      }
+      .metric .value.portfolio {
+        color: #689d6a;
+      }
+
+      .accounts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .account-card {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        padding: 1rem 1.25rem;
+      }
+
+      .account-card .account-name {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #d5c4a1;
+        margin-bottom: 0.1rem;
+      }
+
+      .account-card .account-type {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #665c54;
+        margin-bottom: 0.6rem;
+      }
+
+      .account-card .account-value {
+        font-size: 18px;
+        font-family: "Computer Modern Typewriter", monospace;
+        color: #ebdbb2;
+      }
+
+      .account-card .account-sub {
+        font-size: 11px;
+        color: #665c54;
+        margin-top: 0.2rem;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #665c54;
+        font-weight: 400;
+        text-align: left;
+        padding: 0.35rem 0.5rem 0.35rem 0;
+        border-bottom: 1px solid #3c3836;
+      }
+
+      td {
+        padding: 0.4rem 0.5rem 0.4rem 0;
+        border-bottom: 1px solid #1d2021;
+        color: #a89984;
+        font-family: "Computer Modern Typewriter", monospace;
+        vertical-align: middle;
+      }
+
+      td.label-col {
+        font-family: "Computer Modern Sans", sans-serif;
+        color: #d5c4a1;
+      }
+
+      td.right,
+      th.right {
+        text-align: right;
+      }
+
+      .pill {
+        display: inline-block;
+        font-size: 10px;
+        font-family: "Computer Modern Sans", sans-serif;
+        padding: 1px 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border: 1px solid;
+      }
+
+      .pill.buy {
+        color: #98971a;
+        border-color: #665c00;
+      }
+      .pill.sell {
+        color: #cc241d;
+        border-color: #79150c;
+      }
+      .pill.deposit {
+        color: #689d6a;
+        border-color: #3a5e3b;
+      }
+      .pill.withdrawal {
+        color: #d65d0e;
+        border-color: #7a3000;
+      }
+
+      .loading {
+        color: #665c54;
+        font-size: 13px;
+        font-family: "Computer Modern Typewriter", monospace;
+        padding: 0.5rem 0;
+      }
+
+      .error {
+        color: #cc241d;
+        font-size: 13px;
+        font-family: "Computer Modern Typewriter", monospace;
+        padding: 0.5rem 0;
+      }
+
+      .empty {
+        color: #665c54;
+        font-size: 13px;
+        font-family: "Computer Modern Typewriter", monospace;
+        padding: 0.5rem 0;
+      }
+
+      .nav {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .nav a {
+        color: #665c54;
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        color: #a89984;
+      }
+
+      .nav a.active {
+        color: #8bb39d;
+      }
+
+      button.refresh {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        color: #665c54;
+        font-family: "Computer Modern Sans", sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.2rem 0.6rem;
+        cursor: pointer;
+      }
+
+      button.refresh:hover {
+        color: #a89984;
+        border-color: #665c54;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="/">console</a>
+      <a href="/dashboard" class="active">dashboard</a>
+    </nav>
+    <h1>iris // dashboard</h1>
+    <div class="subtitle" id="timestamp">loading...</div>
+    <hr />
+
+    <div class="summary-grid" id="summary">
+      <div class="metric">
+        <div class="label">total cash</div>
+        <div class="value cash loading">--</div>
+      </div>
+      <div class="metric">
+        <div class="label">portfolio cost basis</div>
+        <div class="value portfolio loading">--</div>
+      </div>
+      <div class="metric">
+        <div class="label">net worth (est.)</div>
+        <div class="value loading">--</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      accounts
+      <button class="refresh" onclick="load()">refresh</button>
+    </div>
+    <div class="accounts-grid" id="accounts-grid">
+      <div class="loading">loading...</div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="section-header">holdings</div>
+        <div id="holdings-container"><div class="loading">loading...</div></div>
+      </div>
+      <div>
+        <div class="section-header">recent activity</div>
+        <div id="activity-container"><div class="loading">loading...</div></div>
+      </div>
+    </div>
+
+    <script>
+      const BASE = "";
+      const CASH_TYPES = new Set(["CHECKING", "SAVINGS"]);
+      const BROKERAGE_TYPES = new Set([
+        "BROKERAGE",
+        "401K",
+        "ROTH_IRA",
+        "TRADITIONAL_IRA",
+      ]);
+      const ACTIVITY_LIMIT = 10;
+      const PILL_CLASS = {
+        BUY: "buy",
+        SELL: "sell",
+        DEPOSIT: "deposit",
+        WITHDRAWAL: "withdrawal",
+      };
+
+      function formatPrice(n) {
+        return (
+          "$" +
+          Number(n).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+      }
+
+      function formatShares(n) {
+        return Number(n).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 6,
+        });
+      }
+
+      function formatTime(ts) {
+        return new Date(ts).toLocaleTimeString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      }
+
+      async function fetchJson(path) {
+        const response = await fetch(BASE + path);
+        if (!response.ok) {
+          throw new Error(`${response.status} ${path}`);
+        }
+        return response.json();
+      }
+
+      function costBasisMap(trades) {
+        const basis = {};
+        trades.forEach((t) => {
+          const sign = t.type === "BUY" ? 1 : -1;
+          basis[t.ticker] = (basis[t.ticker] || 0) + sign * t.shares * t.price;
+        });
+        return basis;
+      }
+
+      function renderSummary(accountData) {
+        let totalCash = 0;
+        let totalPortfolio = 0;
+
+        accountData.forEach(({ account, detail, basis }) => {
+          if (CASH_TYPES.has(account.type) && detail.balance != null) {
+            totalCash += detail.balance;
+          }
+          if (BROKERAGE_TYPES.has(account.type)) {
+            totalPortfolio += Object.values(basis).reduce((s, v) => s + v, 0);
+          }
+        });
+
+        document.getElementById("summary").innerHTML = `
+          <div class="metric">
+            <div class="label">total cash</div>
+            <div class="value cash">${formatPrice(totalCash)}</div>
+          </div>
+          <div class="metric">
+            <div class="label">portfolio cost basis</div>
+            <div class="value portfolio">${formatPrice(totalPortfolio)}</div>
+          </div>
+          <div class="metric">
+            <div class="label">net worth (est.)</div>
+            <div class="value">${formatPrice(totalCash + totalPortfolio)}</div>
+          </div>
+        `;
+      }
+
+      function renderAccounts(accountData) {
+        const grid = document.getElementById("accounts-grid");
+        if (!accountData.length) {
+          grid.innerHTML = '<div class="empty">no accounts</div>';
+          return;
+        }
+
+        grid.innerHTML = accountData
+          .map(({ account, detail, holdings, basis }) => {
+            if (CASH_TYPES.has(account.type)) {
+              return `
+                <div class="account-card">
+                  <div class="account-name">${account.name}</div>
+                  <div class="account-type">${account.type}</div>
+                  <div class="account-value">${detail.balance != null ? formatPrice(detail.balance) : "—"}</div>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="account-card">
+                <div class="account-name">${account.name}</div>
+                <div class="account-type">${account.type}</div>
+                <div class="account-value">${formatPrice(holdings.reduce((s, h) => s + (basis[h.ticker] || 0), 0))}</div>
+                <div class="account-sub">cost basis · ${holdings.length} position${holdings.length !== 1 ? "s" : ""}</div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function renderHoldings(accountData) {
+        const container = document.getElementById("holdings-container");
+        const rows = [];
+        accountData.forEach(({ account, holdings, basis }) => {
+          holdings.forEach((h) => {
+            rows.push({
+              account: account.name,
+              ticker: h.ticker,
+              shares: h.shares,
+              basis: basis[h.ticker] || 0,
+            });
+          });
+        });
+
+        if (!rows.length) {
+          container.innerHTML = '<div class="empty">no holdings</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ticker</th>
+                <th>account</th>
+                <th class="right">shares</th>
+                <th class="right">cost basis</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows
+                .map(
+                  (h) => `
+                <tr>
+                  <td class="label-col">${h.ticker}</td>
+                  <td class="label-col">${h.account}</td>
+                  <td class="right">${formatShares(h.shares)}</td>
+                  <td class="right">${formatPrice(h.basis)}</td>
+                </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function renderActivity(accountData) {
+        const container = document.getElementById("activity-container");
+        const events = [];
+
+        accountData.forEach(({ account, transactions, trades }) => {
+          transactions.forEach((t) => {
+            events.push({
+              id: t.id,
+              account: account.name,
+              type: t.type,
+              label: t.type,
+              amount: t.amount,
+              timestamp: t.timestamp,
+            });
+          });
+          trades.forEach((t) => {
+            events.push({
+              id: t.id,
+              account: account.name,
+              type: t.type,
+              label: `${t.type} ${t.ticker}`,
+              amount: t.shares * t.price,
+              timestamp: t.timestamp,
+            });
+          });
+        });
+
+        events.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1));
+        console.log(events);
+
+        const recent = events.slice(0, ACTIVITY_LIMIT);
+        if (!recent.length) {
+          container.innerHTML = '<div class="empty">no activity</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>account</th>
+                <th>type</th>
+                <th class="right">amount</th>
+                <th class="right">time</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recent
+                .map(
+                  (e) => `
+                    <tr>
+                      <td class="label-col">${e.account}</td>
+                      <td><span class="pill ${PILL_CLASS[e.type] || ""}">${e.label}</span></td>
+                      <td class="right">${formatPrice(e.amount)}</td>
+                      <td class="right">${formatTime(e.timestamp)}</td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      async function load() {
+        document.getElementById("timestamp").textContent = "loading...";
+
+        try {
+          const accounts = await fetchJson("/accounts");
+
+          const [
+            detailsByAccount,
+            holdingsByAccount,
+            transactionsByAccount,
+            tradesByAccount,
+          ] = await Promise.all([
+            Promise.all(accounts.map((a) => fetchJson(`/accounts/${a.name}`))),
+            Promise.all(
+              accounts.map((a) =>
+                BROKERAGE_TYPES.has(a.type)
+                  ? fetchJson(`/accounts/${a.name}/holdings`).catch(() => [])
+                  : Promise.resolve([]),
+              ),
+            ),
+            Promise.all(
+              accounts.map((a) =>
+                fetchJson(`/accounts/${a.name}/transactions`).catch(() => []),
+              ),
+            ),
+            Promise.all(
+              accounts.map((a) =>
+                BROKERAGE_TYPES.has(a.type)
+                  ? fetchJson(`/accounts/${a.name}/trades`).catch(() => [])
+                  : Promise.resolve([]),
+              ),
+            ),
+          ]);
+
+          const accountData = accounts.map((a, i) => ({
+            account: a,
+            detail: detailsByAccount[i],
+            holdings: holdingsByAccount[i],
+            transactions: transactionsByAccount[i],
+            trades: tradesByAccount[i],
+            basis: costBasisMap(tradesByAccount[i]),
+          }));
+
+          renderSummary(accountData);
+          renderAccounts(accountData);
+          renderHoldings(accountData);
+          renderActivity(accountData);
+
+          const now = new Date();
+          document.getElementById("timestamp").textContent =
+            "as of " +
+            now.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }) +
+            " · " +
+            now.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            });
+        } catch (e) {
+          document.getElementById("timestamp").textContent =
+            "error: " + e.message;
+        }
+      }
+
+      load();
+    </script>
+  </body>
+</html>

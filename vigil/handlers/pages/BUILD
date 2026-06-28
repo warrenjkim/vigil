@@ -73,3 +73,14 @@ cc_library(
         "@pulse//pulse/strings:string_literal",
     ],
 )
+
+cc_library(
+    name = "dashboard_handler",
+    hdrs = ["dashboard_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":static_handler",
+        "//iris:dashboard_html",
+        "@pulse//pulse/http:method",
+    ],
+)
