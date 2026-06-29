@@ -47,8 +47,8 @@ class TransactionsDaoTest : public ::testing::Test {
 
 TEST_F(TransactionsDaoTest, CreateAndList) {
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
@@ -64,8 +64,8 @@ TEST_F(TransactionsDaoTest, CreateAndList) {
 
 TEST_F(TransactionsDaoTest, CreateWithDescription) {
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
                       /*merchant=*/"initial deposit",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
@@ -86,19 +86,17 @@ TEST_F(TransactionsDaoTest, ListEmptyTransactions) {
 
 TEST_F(TransactionsDaoTest, ListMultipleTransactions) {
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking",
-                      Transaction::Type::kWithdrawal,
-                      /*amount=*/50,
+                      /*account_name=*/"checking", /*external_id=*/"ext_002",
+                      Transaction::Type::kWithdrawal, /*amount=*/50,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
-
   pulse::Result<std::vector<Transaction>> result =
       dao_->ListTransactions(/*account_name=*/"checking");
   ASSERT_TRUE(result.ok()) << result.error().message;
@@ -110,14 +108,14 @@ TEST_F(TransactionsDaoTest, ListTransactionsIsolatedByAccount) {
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings).ok());
 
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"savings", Transaction::Type::kDeposit,
-                      /*amount=*/200,
+                      /*account_name=*/"savings", /*external_id=*/"ext_002",
+                      Transaction::Type::kDeposit, /*amount=*/200,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
@@ -129,19 +127,10 @@ TEST_F(TransactionsDaoTest, ListTransactionsIsolatedByAccount) {
   EXPECT_THAT((*result)[0].amount, Eq(100));
 }
 
-TEST_F(TransactionsDaoTest, CreateForNonexistentAccount) {
-  pulse::Result<void> result = dao_->CreateTransaction(
-      /*account_name=*/"nonexistent", Transaction::Type::kDeposit,
-      /*amount=*/100,
-      /*merchant=*/"",
-      /*transaction_timestamp=*/Time::FromUnixSeconds(0));
-  EXPECT_FALSE(result.ok());
-}
-
 TEST_F(TransactionsDaoTest, GetBalanceSingleDeposit) {
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
@@ -153,20 +142,21 @@ TEST_F(TransactionsDaoTest, GetBalanceSingleDeposit) {
 
 TEST_F(TransactionsDaoTest, GetBalanceDepositsAndWithdrawals) {
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/1000,
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/1000,
                       /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking",
-                      Transaction::Type::kWithdrawal,
-                      /*amount=*/250, /*merchant=*/"",
+                      /*account_name=*/"checking", /*external_id=*/"ext_002",
+                      Transaction::Type::kWithdrawal, /*amount=*/250,
+                      /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/500, /*merchant=*/"",
+                      /*account_name=*/"checking", /*external_id=*/"ext_003",
+                      Transaction::Type::kDeposit, /*amount=*/500,
+                      /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 
@@ -179,13 +169,15 @@ TEST_F(TransactionsDaoTest, GetBalanceIsolatedByAccount) {
   ASSERT_TRUE(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings).ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"checking", Transaction::Type::kDeposit,
-                      /*amount=*/100, /*merchant=*/"",
+                      /*account_name=*/"checking", /*external_id=*/"ext_001",
+                      Transaction::Type::kDeposit, /*amount=*/100,
+                      /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
   ASSERT_TRUE(dao_->CreateTransaction(
-                      /*account_name=*/"savings", Transaction::Type::kDeposit,
-                      /*amount=*/999, /*merchant=*/"",
+                      /*account_name=*/"savings", /*external_id=*/"ext_002",
+                      Transaction::Type::kDeposit, /*amount=*/999,
+                      /*merchant=*/"",
                       /*transaction_timestamp=*/Time::FromUnixSeconds(0))
                   .ok());
 

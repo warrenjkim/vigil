@@ -72,7 +72,8 @@ TEST_F(ListTransactionsHandlerTest, EmptyList) {
 
 TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"",
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -84,7 +85,8 @@ TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
 
 TEST_F(ListTransactionsHandlerTest, WithDescription) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"paycheck",
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"paycheck",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
@@ -94,12 +96,13 @@ TEST_F(ListTransactionsHandlerTest, WithDescription) {
 
 TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100, /*merchant=*/"",
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kWithdrawal, 50,
-      /*merchant=*/"",
-      /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
+      /*account_name=*/"checking", /*external_id=*/"ext_002",
+      Transaction::Type::kWithdrawal, /*amount=*/50,
+      /*merchant=*/"", /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
   EXPECT_THAT(response.status, Eq(200));
@@ -111,12 +114,12 @@ TEST_F(ListTransactionsHandlerTest, IsolatedByAccount) {
   pulse::DieIfError(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "savings", Transaction::Type::kDeposit, 999,
-      /*merchant=*/"",
+      /*account_name=*/"savings", /*external_id=*/"ext_001",
+      Transaction::Type::kDeposit, /*amount=*/999, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      "checking", Transaction::Type::kDeposit, 100,
-      /*merchant=*/"",
+      /*account_name=*/"checking", /*external_id=*/"ext_002",
+      Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});

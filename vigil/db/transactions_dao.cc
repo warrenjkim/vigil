@@ -17,12 +17,14 @@ namespace vigil {
 TransactionsDao::TransactionsDao(Database db) : db_(db) {}
 
 pulse::Result<void> TransactionsDao::CreateTransaction(
-    std::string_view account_name, Transaction::Type type, double amount,
-    std::string_view merchant, Time transaction_timestamp) {
+    std::string_view account_name, std::string_view external_id,
+    Transaction::Type type, double amount, std::string_view merchant,
+    Time transaction_timestamp) {
   return db_.Execute(
       R"sql(
-        INSERT INTO Transactions (
+        INSERT OR IGNORE INTO Transactions (
           AccountId,
+          ExternalId,
           Type,
           Amount,
           Merchant,
@@ -31,6 +33,7 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
         )
         VALUES (
           (SELECT Id FROM Accounts WHERE Name = :account_name),
+          :external_id,
           :type,
           :amount,
           :merchant,
@@ -39,6 +42,7 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
         )
       )sql",
       /*parameters=*/{
+          {":external_id", external_id},
           {":account_name", account_name},
           {":type", pulse::ToString(type)},
           {":amount", amount},

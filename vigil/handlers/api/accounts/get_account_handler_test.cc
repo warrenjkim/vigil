@@ -87,12 +87,13 @@ TEST_F(GetAccountHandlerTest, GetAccountWithBalance) {
   pulse::DieIfError(
       accounts_dao_->CreateAccount("checking", Account::Type::kChecking));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      /*account_name=*/"checking", Transaction::Type::kDeposit,
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      Transaction::Type::kDeposit,
       /*amount=*/1000, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
   pulse::DieIfError(transactions_dao_->CreateTransaction(
-      /*account_name=*/"checking", Transaction::Type::kWithdrawal,
-      /*amount=*/250, /*merchant=*/"",
+      /*account_name=*/"checking", /*external_id=*/"ext_002",
+      Transaction::Type::kWithdrawal, /*amount=*/250, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
 
   Response response = RunMethod(Request{.path = {{"name", "checking"}}});
