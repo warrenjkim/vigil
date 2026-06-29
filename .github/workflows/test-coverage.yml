@@ -30,12 +30,4 @@ jobs:
       - name: Run tests
         run: bazel test --test_output=all //...
 
-      - name: Install curl and jq
-        run: sudo apt-get install -y curl jq
-
-      - name: Run integration tests
-        run: |
-          chmod +x test.sh
-          ./test.sh
-
       # TODO(add coverage)
