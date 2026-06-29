@@ -71,7 +71,7 @@ TEST_F(ListTransactionsHandlerTest, EmptyList) {
 }
 
 TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", /*external_id=*/"ext_001",
       Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
@@ -84,7 +84,7 @@ TEST_F(ListTransactionsHandlerTest, ListsTransactions) {
 }
 
 TEST_F(ListTransactionsHandlerTest, WithDescription) {
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", /*external_id=*/"ext_001",
       Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"paycheck",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
@@ -95,11 +95,11 @@ TEST_F(ListTransactionsHandlerTest, WithDescription) {
 }
 
 TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", /*external_id=*/"ext_001",
       Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", /*external_id=*/"ext_002",
       Transaction::Type::kWithdrawal, /*amount=*/50,
       /*merchant=*/"", /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
@@ -113,11 +113,11 @@ TEST_F(ListTransactionsHandlerTest, MultipleTransactions) {
 TEST_F(ListTransactionsHandlerTest, IsolatedByAccount) {
   pulse::DieIfError(
       accounts_dao_->CreateAccount("savings", Account::Type::kSavings));
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"savings", /*external_id=*/"ext_001",
       Transaction::Type::kDeposit, /*amount=*/999, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));
-  pulse::DieIfError(transactions_dao_->CreateTransaction(
+  (void)pulse::UnwrapOrDie(transactions_dao_->CreateTransaction(
       /*account_name=*/"checking", /*external_id=*/"ext_002",
       Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
       /*transaction_timestamp=*/Time::FromUnixSeconds(0)));

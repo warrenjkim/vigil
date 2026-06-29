@@ -1,4 +1,50 @@
 cc_library(
+    name = "import_transactions_handler",
+    srcs = ["import_transactions_handler.cc"],
+    hdrs = ["import_transactions_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:time",
+        "//vigil/db:transaction",
+        "//vigil/services:transaction_service",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/json:bind",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
+    ],
+)
+
+cc_test(
+    name = "import_transactions_handler_test",
+    srcs = ["import_transactions_handler_test.cc"],
+    deps = [
+        ":import_transactions_handler",
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "//vigil/db:transaction",
+        "//vigil/db:transactions_dao",
+        "//vigil/services:transaction_service",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:result_or_die",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
+    ],
+)
+
+cc_library(
     name = "list_transactions_handler",
     srcs = ["list_transactions_handler.cc"],
     hdrs = ["list_transactions_handler.h"],

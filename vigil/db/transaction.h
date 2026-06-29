@@ -27,7 +27,8 @@ struct Transaction {
   friend bool operator==(const Transaction&, const Transaction&) = default;
 };
 
-PULSE_STRING_TO_ENUM(Transaction::Type, ToTransferType, TRANSACTION_TYPE_TABLE);
+PULSE_STRING_TO_ENUM(Transaction::Type, ToTransactionType,
+                     TRANSACTION_TYPE_TABLE);
 
 }  // namespace vigil
 

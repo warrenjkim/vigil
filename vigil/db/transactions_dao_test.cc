@@ -77,6 +77,37 @@ TEST_F(TransactionsDaoTest, CreateWithDescription) {
   EXPECT_THAT((*result)[0].merchant, StrEq("initial deposit"));
 }
 
+TEST_F(TransactionsDaoTest, CreateIgnoreNonexistentAccount) {
+  pulse::Result<bool> result = dao_->CreateTransaction(
+      /*account_name=*/"nonexistent", /*external_id=*/"ext_001",
+      /*type=*/Transaction::Type::kDeposit, /*amount=*/100,
+      /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0));
+  ASSERT_TRUE(result.ok());
+  EXPECT_FALSE(*result);
+}
+
+TEST_F(TransactionsDaoTest, CreateIgnoreDuplicateExternalId) {
+  pulse::Result<bool> first = dao_->CreateTransaction(
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      /*type=*/Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0));
+  ASSERT_TRUE(first.ok());
+  EXPECT_TRUE(*first);
+
+  pulse::Result<bool> second = dao_->CreateTransaction(
+      /*account_name=*/"checking", /*external_id=*/"ext_001",
+      /*type=*/Transaction::Type::kDeposit, /*amount=*/100, /*merchant=*/"",
+      /*transaction_timestamp=*/Time::FromUnixSeconds(0));
+  ASSERT_TRUE(second.ok());
+  EXPECT_FALSE(*second);
+
+  pulse::Result<std::vector<Transaction>> result =
+      dao_->ListTransactions(/*account_name=*/"checking");
+  ASSERT_TRUE(result.ok());
+  EXPECT_THAT(*result, SizeIs(1));
+}
+
 TEST_F(TransactionsDaoTest, ListEmptyTransactions) {
   pulse::Result<std::vector<Transaction>> result =
       dao_->ListTransactions(/*account_name=*/"checking");

@@ -16,6 +16,7 @@ cc_binary(
         "//vigil/handlers/api/holdings:list_holdings_handler",
         "//vigil/handlers/api/trades:create_trade_handler",
         "//vigil/handlers/api/trades:list_trades_handler",
+        "//vigil/handlers/api/transactions:import_transactions_handler",
         "//vigil/handlers/api/transactions:list_transactions_handler",
         "//vigil/handlers/pages:dashboard_handler",
         "//vigil/handlers/pages:get_new_account_handler",

@@ -14,7 +14,7 @@ class TransactionsDao {
  public:
   explicit TransactionsDao(Database db);
 
-  pulse::Result<void> CreateTransaction(std::string_view account_name,
+  pulse::Result<bool> CreateTransaction(std::string_view account_name,
                                         std::string_view external_id,
                                         Transaction::Type type, double amount,
                                         std::string_view merchant,

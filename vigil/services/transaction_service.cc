@@ -18,26 +18,35 @@ TransactionService::TransactionService(Database* db, AccountsDao* accounts_dao,
       accounts_dao_(*accounts_dao),
       transactions_dao_(*transactions_dao) {}
 
-pulse::Result<void> TransactionService::ImportTransactions(
+pulse::Result<int> TransactionService::ImportTransactions(
     std::string_view account_name, std::span<const Transaction> transactions) {
   if (pulse::Result<Account> account = accounts_dao_.GetAccount(account_name);
       !account.ok()) {
     return account.error();
   }
 
-  return WrapInTransaction(
-      &db_, [this, account_name, transactions] -> pulse::Result<void> {
-        for (const Transaction& t : transactions) {
-          if (pulse::Result<void> err = transactions_dao_.CreateTransaction(
+  int imported = 0;
+  if (pulse::Result<void> err = WrapInTransaction(
+          &db_,
+          [this, &imported, account_name, transactions] -> pulse::Result<void> {
+            for (const Transaction& t : transactions) {
+              pulse::Result<bool> created = transactions_dao_.CreateTransaction(
                   account_name, t.external_id, t.type, t.amount, t.merchant,
                   t.transaction_timestamp);
-              !err.ok()) {
-            return err.error();
-          }
-        }
+              if (!created.ok()) {
+                return created.error();
+              }
 
-        return pulse::Result<void>{};
-      });
+              imported += *created;
+            }
+
+            return pulse::Result<void>{};
+          });
+      !err.ok()) {
+    return err.error();
+  }
+
+  return imported;
 }
 
 }  // namespace vigil

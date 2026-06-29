@@ -50,6 +50,9 @@ class Database {
       std::unordered_map<std::string, SqlValue> parameters = {},
       F&& callback = {});
 
+  // Returns the number of rows modified by the most recent call to `Execute()`.
+  int Changes() const;
+
  private:
   struct NoOp {
     constexpr void operator()() const {}

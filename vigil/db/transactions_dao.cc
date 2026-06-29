@@ -16,12 +16,12 @@ namespace vigil {
 
 TransactionsDao::TransactionsDao(Database db) : db_(db) {}
 
-pulse::Result<void> TransactionsDao::CreateTransaction(
+pulse::Result<bool> TransactionsDao::CreateTransaction(
     std::string_view account_name, std::string_view external_id,
     Transaction::Type type, double amount, std::string_view merchant,
     Time transaction_timestamp) {
-  return db_.Execute(
-      R"sql(
+  if (pulse::Result<void> err = db_.Execute(
+          R"sql(
         INSERT OR IGNORE INTO Transactions (
           AccountId,
           ExternalId,
@@ -41,14 +41,19 @@ pulse::Result<void> TransactionsDao::CreateTransaction(
           :commit_timestamp
         )
       )sql",
-      /*parameters=*/{
-          {":external_id", external_id},
-          {":account_name", account_name},
-          {":type", pulse::ToString(type)},
-          {":amount", amount},
-          {":merchant", merchant},
-          {":transaction_timestamp", transaction_timestamp.ToUnixSeconds()},
-          {":commit_timestamp", Time::Now().ToUnixSeconds()}});
+          /*parameters=*/{{":external_id", external_id},
+                          {":account_name", account_name},
+                          {":type", pulse::ToString(type)},
+                          {":amount", amount},
+                          {":merchant", merchant},
+                          {":transaction_timestamp",
+                           transaction_timestamp.ToUnixSeconds()},
+                          {":commit_timestamp", Time::Now().ToUnixSeconds()}});
+      !err.ok()) {
+    return err.error();
+  }
+
+  return db_.Changes() > 0;
 }
 
 pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
@@ -78,7 +83,7 @@ pulse::Result<std::vector<Transaction>> TransactionsDao::ListTransactions(
             transactions.push_back(
                 Transaction{.id = id,
                             .account_name = std::move(account_name),
-                            .type = ToTransferType(type),
+                            .type = ToTransactionType(type),
                             .amount = amount,
                             .merchant = std::move(merchant),
                             .transaction_timestamp =

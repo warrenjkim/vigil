@@ -97,4 +97,6 @@ pulse::Result<void> Database::Initialize() {
   return pulse::Result<void>{};
 }
 
+int Database::Changes() const { return sqlite3_changes(db_->handle()); }
+
 }  // namespace vigil

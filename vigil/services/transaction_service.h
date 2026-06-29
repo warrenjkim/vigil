@@ -16,7 +16,7 @@ class TransactionService {
   TransactionService(Database* db, AccountsDao* accounts_dao,
                      TransactionsDao* transactions_dao);
 
-  pulse::Result<void> ImportTransactions(
+  pulse::Result<int> ImportTransactions(
       std::string_view account_name, std::span<const Transaction> transactions);
 
  private:
