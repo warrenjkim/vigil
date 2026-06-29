@@ -22,7 +22,6 @@ cc_test(
     srcs = ["get_holding_handler_test.cc"],
     deps = [
         ":get_holding_handler",
-        "//vigil:trade_service",
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
@@ -30,6 +29,7 @@ cc_test(
         "//vigil/db:time",
         "//vigil/db:trade",
         "//vigil/db:trades_dao",
+        "//vigil/services:trade_service",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@pulse//pulse/core:result_or_die",
@@ -64,7 +64,6 @@ cc_test(
     srcs = ["list_holdings_handler_test.cc"],
     deps = [
         ":list_holdings_handler",
-        "//vigil:trade_service",
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
@@ -72,6 +71,7 @@ cc_test(
         "//vigil/db:time",
         "//vigil/db:trade",
         "//vigil/db:trades_dao",
+        "//vigil/services:trade_service",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
         "@pulse//pulse/core:result_or_die",

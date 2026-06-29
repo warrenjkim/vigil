@@ -24,7 +24,8 @@
 #include "vigil/handlers/pages/get_new_account_handler.h"
 #include "vigil/handlers/pages/health_handler.h"
 #include "vigil/handlers/pages/index_handler.h"
-#include "vigil/trade_service.h"
+#include "vigil/services/trade_service.h"
+#include "vigil/services/transaction_service.h"
 
 // TODO(move to pulse)
 const char* GetFlag(int argc, char** argv, const char* flag,
@@ -67,10 +68,12 @@ int main(int argc, char** argv) {
   vigil::HoldingsDao holdings_dao(db);
   vigil::TradesDao trades_dao(db);
   vigil::TradeService trade_service(&db, &trades_dao, &holdings_dao);
+  vigil::TransactionService transaction_service(&db, &accounts_dao,
+                                                &transactions_dao);
 
   pulse::http::ServerContext<vigil::AccountsDao*, vigil::TransactionsDao*,
                              vigil::HoldingsDao*, vigil::TradesDao*,
-                             vigil::TradeService*>
+                             vigil::TradeService*, vigil::TransactionService*>
       ctx;
   ctx.set(&accounts_dao);
   ctx.set(&transactions_dao);

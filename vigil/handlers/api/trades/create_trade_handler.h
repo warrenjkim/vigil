@@ -4,7 +4,7 @@
 #include "pulse/http/method.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
-#include "vigil/trade_service.h"
+#include "vigil/services/trade_service.h"
 
 namespace vigil {
 

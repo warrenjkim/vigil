@@ -3,7 +3,6 @@ cc_binary(
     srcs = ["main.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        ":trade_service",
         "//vigil/db:accounts_dao",
         "//vigil/db:database",
         "//vigil/db:holdings_dao",
@@ -22,49 +21,12 @@ cc_binary(
         "//vigil/handlers/pages:get_new_account_handler",
         "//vigil/handlers/pages:health_handler",
         "//vigil/handlers/pages:index_handler",
+        "//vigil/services:trade_service",
+        "//vigil/services:transaction_service",
         "@pulse//pulse/core:result_or_die",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:router",
         "@pulse//pulse/http:server",
-    ],
-)
-
-cc_library(
-    name = "trade_service",
-    srcs = ["trade_service.cc"],
-    hdrs = ["trade_service.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//vigil/db:database",
-        "//vigil/db:holding",
-        "//vigil/db:holdings_dao",
-        "//vigil/db:time",
-        "//vigil/db:trade",
-        "//vigil/db:trades_dao",
-        "@pulse//pulse/core:error",
-        "@pulse//pulse/core:result",
-        "@pulse//pulse/strings:cat",
-    ],
-)
-
-cc_test(
-    name = "trade_service_test",
-    srcs = ["trade_service_test.cc"],
-    deps = [
-        ":trade_service",
-        "//vigil/db:account",
-        "//vigil/db:accounts_dao",
-        "//vigil/db:database",
-        "//vigil/db:holding",
-        "//vigil/db:holdings_dao",
-        "//vigil/db:time",
-        "//vigil/db:trade",
-        "//vigil/db:trades_dao",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:error",
-        "@pulse//pulse/core:result",
-        "@pulse//pulse/core:result_or_die",
     ],
 )

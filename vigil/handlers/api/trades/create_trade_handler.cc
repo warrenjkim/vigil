@@ -15,7 +15,7 @@
 #include "pulse/json/value.h"
 #include "vigil/db/time.h"
 #include "vigil/db/trade.h"
-#include "vigil/trade_service.h"
+#include "vigil/services/trade_service.h"
 
 namespace vigil {
 

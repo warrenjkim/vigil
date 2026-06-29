@@ -1,4 +1,4 @@
-#include "vigil/trade_service.h"
+#include "vigil/services/trade_service.h"
 
 #include <optional>
 #include <string_view>

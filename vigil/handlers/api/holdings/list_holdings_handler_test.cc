@@ -18,7 +18,7 @@
 #include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/db/trades_dao.h"
-#include "vigil/trade_service.h"
+#include "vigil/services/trade_service.h"
 
 namespace vigil {
 
