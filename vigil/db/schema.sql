@@ -13,7 +13,7 @@ CREATE TABLE Transactions (
   -- DEPOSIT, WITHDRAWAL
   Type TEXT NOT NULL,
   Amount REAL NOT NULL,
-  ExternalId TEXT UNIQUE,
+  ExternalId TEXT NOT NULL UNIQUE,
   Merchant TEXT NOT NULL,
   TransactionTimestamp INTEGER NOT NULL,
   CommitTimestamp INTEGER NOT NULL
