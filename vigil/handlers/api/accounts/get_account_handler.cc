@@ -38,19 +38,27 @@ pulse::http::Response GetAccountHandler::operator()(
   pulse::json::Object body{{"id", account->id},
                            {"name", account->name},
                            {"type", pulse::ToString(account->type)}};
-
-  if (account->type == Account::Type::kChecking ||
-      account->type == Account::Type::kSavings) {
-    pulse::Result<double> balance = transactions_dao_.GetBalance(*name);
-    if (!balance.ok()) {
-      pulse::Log() << "GetAccount: balance lookup failed: "
-                   << balance.error().message;
-      return pulse::http::Response{.content_type = "application/json",
-                                   .status = 500,
-                                   .body = R"({"status": "internal"})"};
-    }
-
-    body["balance"] = *balance;
+  // TODO(add non-cash account balances)
+  switch (account->type) {
+    case Account::Type::kChecking:
+    case Account::Type::kSavings:
+    case Account::Type::kCreditCard: {
+      pulse::Result<double> balance = transactions_dao_.GetBalance(*name);
+      if (!balance.ok()) {
+        pulse::Log() << "GetAccount: balance lookup failed: "
+                     << balance.error().message;
+        return pulse::http::Response{.content_type = "application/json",
+                                     .status = 500,
+                                     .body = R"({"status": "internal"})"};
+      }
+      body["balance"] = *balance;
+    } break;
+    case Account::Type::kBrokerage:
+    case Account::Type::k401k:
+    case Account::Type::kRothIra:
+    case Account::Type::kTraditionalIra:
+    case Account::Type::kUnknown:
+      break;
   }
 
   pulse::Log() << "GetAccount: lookup succeeded: " << pulse::ToString(body);
