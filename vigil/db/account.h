@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "pulse/core/enum_macros.h"
@@ -23,6 +24,7 @@ struct Account {
   int id;
   std::string name;
   Type type;
+  std::optional<double> balance;
 
   friend bool operator==(const Account&, const Account&) = default;
 };
