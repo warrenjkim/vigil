@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	seedDate        = flag.String("seed_date", "", "Skip transactions before this date (YYYY-MM-DD); empty = no filter")
 	plaidConfigPath = flag.String("plaid_config", "plaid-config.json", "Path to Plaid config file")
 	plaidBaseURL    = flag.String("plaid_base_url", "https://production.plaid.com", "Plaid base URL")
 	vigilBaseURL    = flag.String("vigil_base_url", "http://localhost:8080", "Vigil server base URL")
@@ -319,6 +320,15 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 		"credit card": "CREDIT_CARD",
 	}
 
+	var cutoff time.Time
+	if *seedDate != "" {
+		var err error
+		cutoff, err = time.Parse("2006-01-02", *seedDate)
+		if err != nil {
+			return nil, fmt.Errorf("parse seed date: %w", err)
+		}
+	}
+
 	for _, item := range ctx.Items {
 		prefix, ok := prefixes[item.Alias]
 		if !ok {
@@ -351,6 +361,10 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 				date, err := time.Parse("2006-01-02", t.Date)
 				if err != nil {
 					log.Printf("ToVigilAccounts: parse date %q for transaction %q: %v", t.Date, t.TransactionID, err)
+					continue
+				}
+
+				if !cutoff.IsZero() && date.Before(cutoff) {
 					continue
 				}
 
