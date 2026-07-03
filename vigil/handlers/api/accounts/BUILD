@@ -124,6 +124,7 @@ cc_library(
     deps = [
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
+        "//vigil/services:account_service",
         "@pulse//pulse/core:log",
         "@pulse//pulse/core:result",
         "@pulse//pulse/core:stringify",

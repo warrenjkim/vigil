@@ -4,21 +4,21 @@
 #include "pulse/http/method.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
-#include "vigil/db/accounts_dao.h"
+#include "vigil/services/account_service.h"
 
 namespace vigil {
 
 class ListAccountsHandler final
     : public pulse::http::Handler<pulse::http::Method::kGet, "/accounts",
-                                  pulse::http::Dependencies<AccountsDao*> > {
+                                  pulse::http::Dependencies<AccountService*> > {
  public:
-  explicit ListAccountsHandler(AccountsDao* dao) : dao_(*dao) {}
+  explicit ListAccountsHandler(AccountService* service) : service_(*service) {}
 
   pulse::http::Response operator()(
       const pulse::http::Request& request) const override;
 
  private:
-  AccountsDao& dao_;
+  AccountService& service_;
 };
 
 }  // namespace vigil
