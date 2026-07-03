@@ -6,16 +6,13 @@
 #include "pulse/core/result.h"
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
-#include "vigil/db/database.h"
 #include "vigil/db/transactions_dao.h"
 
 namespace vigil {
 
-AccountService::AccountService(Database* db, AccountsDao* accounts_dao,
-                                 TransactionsDao* transactions_dao)
-    : db_(*db),
-      accounts_dao_(*accounts_dao),
-      transactions_dao_(*transactions_dao) {}
+AccountService::AccountService(AccountsDao* accounts_dao,
+                               TransactionsDao* transactions_dao)
+    : accounts_dao_(*accounts_dao), transactions_dao_(*transactions_dao) {}
 
 pulse::Result<std::vector<Account>> AccountService::ListAccounts() {
   pulse::Result<std::vector<Account>> accounts = accounts_dao_.ListAccounts();

@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
   vigil::TransactionsDao transactions_dao(db);
   vigil::HoldingsDao holdings_dao(db);
   vigil::TradesDao trades_dao(db);
-  vigil::AccountService account_service(&db, &accounts_dao, &transactions_dao);
+  vigil::AccountService account_service(&accounts_dao, &transactions_dao);
   vigil::TradeService trade_service(&db, &trades_dao, &holdings_dao);
   vigil::TransactionService transaction_service(&db, &accounts_dao,
                                                 &transactions_dao);

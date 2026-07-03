@@ -22,6 +22,7 @@ cc_binary(
         "//vigil/handlers/pages:get_new_account_handler",
         "//vigil/handlers/pages:health_handler",
         "//vigil/handlers/pages:index_handler",
+        "//vigil/services:account_service",
         "//vigil/services:trade_service",
         "//vigil/services:transaction_service",
         "@pulse//pulse/core:result_or_die",

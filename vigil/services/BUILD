@@ -6,7 +6,6 @@ cc_library(
     deps = [
         "//vigil/db:account",
         "//vigil/db:accounts_dao",
-        "//vigil/db:database",
         "//vigil/db:transactions_dao",
         "@pulse//pulse/core:log",
         "@pulse//pulse/core:result",
