@@ -1,4 +1,19 @@
 cc_library(
+    name = "account_service",
+    srcs = ["account_service.cc"],
+    hdrs = ["account_service.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/db:account",
+        "//vigil/db:accounts_dao",
+        "//vigil/db:database",
+        "//vigil/db:transactions_dao",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+    ],
+)
+
+cc_library(
     name = "trade_service",
     srcs = ["trade_service.cc"],
     hdrs = ["trade_service.h"],
