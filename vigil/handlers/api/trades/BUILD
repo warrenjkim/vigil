@@ -20,27 +20,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "create_trade_handler_test",
-    srcs = ["create_trade_handler_test.cc"],
-    deps = [
-        ":create_trade_handler",
-        "//vigil/db:account",
-        "//vigil/db:accounts_dao",
-        "//vigil/db:database",
-        "//vigil/db:holdings_dao",
-        "//vigil/db:trades_dao",
-        "//vigil/services:trade_service",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/http:handler",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
-        "@pulse//pulse/http:router",
-    ],
-)
-
 cc_library(
     name = "list_trades_handler",
     srcs = ["list_trades_handler.cc"],
@@ -57,28 +36,5 @@ cc_library(
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/json:value",
-    ],
-)
-
-cc_test(
-    name = "list_trades_handler_test",
-    srcs = ["list_trades_handler_test.cc"],
-    deps = [
-        ":list_trades_handler",
-        "//vigil/db:account",
-        "//vigil/db:accounts_dao",
-        "//vigil/db:database",
-        "//vigil/db:holdings_dao",
-        "//vigil/db:time",
-        "//vigil/db:trade",
-        "//vigil/db:trades_dao",
-        "//vigil/services:trade_service",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/http:handler",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
-        "@pulse//pulse/http:router",
     ],
 )

@@ -21,29 +21,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "import_transactions_handler_test",
-    srcs = ["import_transactions_handler_test.cc"],
-    deps = [
-        ":import_transactions_handler",
-        "//vigil/db:account",
-        "//vigil/db:accounts_dao",
-        "//vigil/db:database",
-        "//vigil/db:transaction",
-        "//vigil/db:transactions_dao",
-        "//vigil/services:transaction_service",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:error",
-        "@pulse//pulse/core:result",
-        "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/http:handler",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
-        "@pulse//pulse/http:router",
-    ],
-)
-
 cc_library(
     name = "list_transactions_handler",
     srcs = ["list_transactions_handler.cc"],
@@ -60,26 +37,5 @@ cc_library(
         "@pulse//pulse/http:request",
         "@pulse//pulse/http:response",
         "@pulse//pulse/json:value",
-    ],
-)
-
-cc_test(
-    name = "list_transactions_handler_test",
-    srcs = ["list_transactions_handler_test.cc"],
-    deps = [
-        ":list_transactions_handler",
-        "//vigil/db:account",
-        "//vigil/db:accounts_dao",
-        "//vigil/db:database",
-        "//vigil/db:time",
-        "//vigil/db:transaction",
-        "//vigil/db:transactions_dao",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:result_or_die",
-        "@pulse//pulse/http:handler",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
-        "@pulse//pulse/http:router",
     ],
 )

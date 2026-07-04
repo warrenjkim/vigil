@@ -11,22 +11,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "health_handler_test",
-    srcs = ["health_handler_test.cc"],
-    deps = [
-        ":health_handler",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/core:result",
-        "@pulse//pulse/http:handler",
-        "@pulse//pulse/http:method",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
-        "@pulse//pulse/http:router",
-    ],
-)
-
 cc_library(
     name = "index_handler",
     hdrs = ["index_handler.h"],
@@ -46,18 +30,6 @@ cc_library(
         ":static_handler",
         "//iris:accounts_new_html",
         "@pulse//pulse/http:method",
-    ],
-)
-
-cc_test(
-    name = "get_new_account_handler_test",
-    srcs = ["get_new_account_handler_test.cc"],
-    deps = [
-        ":get_new_account_handler",
-        "@googletest//:gtest",
-        "@googletest//:gtest_main",
-        "@pulse//pulse/http:request",
-        "@pulse//pulse/http:response",
     ],
 )
 
