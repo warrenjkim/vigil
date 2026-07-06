@@ -2,10 +2,15 @@
 
 #include <cstddef>
 
+#include "iris/accounts_detail_html.h"
+#include "iris/accounts_new_html.h"
+#include "iris/dashboard_html.h"
+#include "iris/iris_html.h"
 #include "pulse/http/handler.h"
 #include "pulse/http/method.h"
 #include "pulse/http/request.h"
 #include "pulse/http/response.h"
+#include "pulse/http/router.h"
 #include "pulse/strings/string_literal.h"
 
 namespace vigil {
@@ -22,5 +27,14 @@ class StaticHandler final
         .content_type = kContentType, .status = 200, .body = kContent};
   }
 };
+
+using StaticFileHandlers = pulse::http::Routes<
+    StaticHandler<pulse::http::Method::kGet, "/", iris::kIrisHtml>,
+    StaticHandler<pulse::http::Method::kGet, "/dashboard",
+                  iris::kDashboardHtml>,
+    StaticHandler<pulse::http::Method::kGet, "/accounts/new",
+                  iris::kAccountsNewHtml>,
+    StaticHandler<pulse::http::Method::kGet, "/accounts/view",
+                  iris::kAccountsDetailHtml>>;
 
 }  // namespace vigil
