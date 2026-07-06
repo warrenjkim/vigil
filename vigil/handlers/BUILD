@@ -14,5 +14,6 @@ cc_library(
         "//vigil/handlers/pages:health_handler",
         "//vigil/handlers/pages:index_handler",
         "//vigil/handlers/pages:get_new_account_handler",
+        "//vigil/handlers/pages:get_account_detail_handler",
     ],
 )

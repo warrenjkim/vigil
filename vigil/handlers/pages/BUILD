@@ -34,6 +34,17 @@ cc_library(
 )
 
 cc_library(
+    name = "get_account_detail_handler",
+    hdrs = ["get_account_detail_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":static_handler",
+        "//iris:accounts_detail_html",
+        "@pulse//pulse/http:method",
+    ],
+)
+
+cc_library(
     name = "static_handler",
     hdrs = ["static_handler.h"],
     visibility = ["//visibility:public"],

@@ -39,6 +39,26 @@ cc_library(
 )
 
 genrule(
+    name = "accounts_detail_html_h",
+    srcs = ["accounts/detail.html"],
+    outs = ["accounts_detail_html.h"],
+    cmd = """(
+        echo '#pragma once'
+        echo 'namespace iris {'
+        echo 'inline constexpr char kAccountsDetailHtml[] = R"html('
+        cat $(location accounts/detail.html)
+        echo ')html";'
+        echo '}  // namespace iris'
+    ) > $@""",
+)
+
+cc_library(
+    name = "accounts_detail_html",
+    hdrs = ["accounts_detail_html.h"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
     name = "dashboard_html_h",
     srcs = ["dashboard.html"],
     outs = ["dashboard_html.h"],

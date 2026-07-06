@@ -22,6 +22,7 @@
 #include "vigil/handlers/api/transactions/import_transactions_handler.h"
 #include "vigil/handlers/api/transactions/list_transactions_handler.h"
 #include "vigil/handlers/pages/dashboard_handler.h"
+#include "vigil/handlers/pages/get_account_detail_handler.h"
 #include "vigil/handlers/pages/get_new_account_handler.h"
 #include "vigil/handlers/pages/health_handler.h"
 #include "vigil/handlers/pages/index_handler.h"
@@ -43,9 +44,9 @@ const char* GetFlag(int argc, char** argv, const char* flag,
   return default_value;
 }
 
-using StaticHandlers =
-    pulse::http::Routes<vigil::IndexHandler, vigil::HealthHandler,
-                        vigil::GetNewAccountHandler, vigil::DashboardHandler>;
+using StaticHandlers = pulse::http::Routes<
+    vigil::IndexHandler, vigil::HealthHandler, vigil::GetNewAccountHandler,
+    vigil::GetAccountDetailHandler, vigil::DashboardHandler>;
 
 using AccountHandlers =
     pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,

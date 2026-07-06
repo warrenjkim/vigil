@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Iris // Account</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts.css"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Computer Modern Sans", sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #dddddd;
+        background-color: #151515;
+        padding: 4rem 6rem;
+      }
+
+      h1 {
+        font-size: 28px;
+        text-transform: uppercase;
+        font-weight: lighter;
+        letter-spacing: 0.1em;
+        color: #dddddd;
+        margin-bottom: 0.25rem;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #665c54;
+        margin-bottom: 1.75rem;
+      }
+
+      hr {
+        border: none;
+        height: 0.1em;
+        background-color: #50665a;
+        margin-bottom: 1.5rem;
+      }
+
+      .nav {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .nav a {
+        color: #665c54;
+        text-decoration: none;
+      }
+
+      .nav a:hover {
+        color: #a89984;
+      }
+
+      .section-header {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #8bb39d;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #3c3836;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      button.refresh {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        color: #665c54;
+        font-family: "Computer Modern Sans", sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.2rem 0.6rem;
+        cursor: pointer;
+      }
+
+      button.refresh:hover {
+        color: #a89984;
+        border-color: #665c54;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .summary-grid.two-metric {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metric.pending .value {
+        color: #665c54;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-family: "Computer Modern Sans", sans-serif;
+      }
+
+      .metric {
+        background: #1d2021;
+        border: 1px solid #3c3836;
+        padding: 1rem 1.25rem;
+      }
+
+      .metric .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #665c54;
+        margin-bottom: 0.4rem;
+      }
+
+      .metric .value {
+        font-size: 22px;
+        font-family: "Computer Modern Typewriter", monospace;
+        color: #ebdbb2;
+      }
+
+      .metric .value.cash {
+        color: #98971a;
+      }
+      .metric .value.portfolio {
+        color: #689d6a;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+      }
+
+      .two-col.single-col {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th {
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #665c54;
+        padding: 0.4rem 0.5rem;
+        border-bottom: 1px solid #3c3836;
+      }
+
+      td {
+        padding: 0.4rem 0.5rem;
+        font-size: 13px;
+        font-family: "Computer Modern Typewriter", monospace;
+        border-bottom: 1px solid #232323;
+      }
+
+      th.right,
+      td.right {
+        text-align: right;
+      }
+
+      td.label-col {
+        font-family: "Computer Modern Sans", sans-serif;
+        color: #d5c4a1;
+      }
+
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 0.1rem 0.4rem;
+        border: 1px solid;
+      }
+
+      .pill.buy,
+      .pill.deposit {
+        color: #98971a;
+        border-color: #98971a;
+      }
+
+      .pill.sell,
+      .pill.withdrawal {
+        color: #cc241d;
+        border-color: #cc241d;
+      }
+
+      .empty {
+        color: #665c54;
+        font-size: 13px;
+        font-family: "Computer Modern Typewriter", monospace;
+        padding: 0.5rem 0;
+      }
+
+      .loading {
+        color: #665c54;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="/">console</a>
+      <a href="/dashboard">dashboard</a>
+    </nav>
+    <h1 id="account-name">iris // account</h1>
+    <div class="subtitle" id="timestamp">loading...</div>
+    <hr />
+
+    <div class="summary-grid" id="summary">
+      <div class="metric">
+        <div class="label">type</div>
+        <div class="value loading">--</div>
+      </div>
+      <div class="metric">
+        <div class="label">balance / cost basis</div>
+        <div class="value loading">--</div>
+      </div>
+      <div class="metric">
+        <div class="label">positions</div>
+        <div class="value loading">--</div>
+      </div>
+    </div>
+
+    <div class="two-col" id="detail-sections">
+      <div id="holdings-section">
+        <div class="section-header">
+          holdings
+          <button class="refresh" onclick="load()">refresh</button>
+        </div>
+        <div id="holdings-container"><div class="loading">loading...</div></div>
+      </div>
+      <div>
+        <div class="section-header">activity</div>
+        <div id="activity-container"><div class="loading">loading...</div></div>
+      </div>
+    </div>
+
+    <script>
+      const BASE = "";
+      const BROKERAGE_TYPES = new Set([
+        "BROKERAGE",
+        "401K",
+        "ROTH_IRA",
+        "TRADITIONAL_IRA",
+      ]);
+      const PILL_CLASS = {
+        BUY: "buy",
+        SELL: "sell",
+        DEPOSIT: "deposit",
+        WITHDRAWAL: "withdrawal",
+      };
+
+      const NAME = new URLSearchParams(window.location.search).get("name");
+
+      function formatPrice(n) {
+        return (
+          "$" +
+          Number(n).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        );
+      }
+
+      function formatShares(n) {
+        return Number(n).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 6,
+        });
+      }
+
+      function formatTime(ts) {
+        return new Date(ts).toLocaleTimeString("en-US", {
+          month: "numeric",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      }
+
+      async function fetchJson(path) {
+        const response = await fetch(BASE + path);
+        if (!response.ok) {
+          throw new Error(`${response.status} ${path}`);
+        }
+        return response.json();
+      }
+
+      function costBasisMap(trades) {
+        const basis = {};
+        trades.forEach((t) => {
+          const sign = t.type === "BUY" ? 1 : -1;
+          basis[t.ticker] = (basis[t.ticker] || 0) + sign * t.shares * t.price;
+        });
+        return basis;
+      }
+
+      function renderSummary(account, detail, holdings, basis) {
+        const isBrokerage = BROKERAGE_TYPES.has(account.type);
+        const value = isBrokerage
+          ? holdings.reduce((s, h) => s + (basis[h.ticker] || 0), 0)
+          : detail.balance;
+
+        const extraMetrics = isBrokerage
+          ? `
+            <div class="metric">
+              <div class="label">positions</div>
+              <div class="value">${holdings.length}</div>
+            </div>
+            <div class="metric pending">
+              <div class="label">market value</div>
+              <div class="value">TODO(implement)</div>
+            </div>
+          `
+          : "";
+
+        document.getElementById("summary").innerHTML = `
+          <div class="metric">
+            <div class="label">type</div>
+            <div class="value">${account.type}</div>
+          </div>
+          <div class="metric">
+            <div class="label">${isBrokerage ? "cost basis" : "balance"}</div>
+            <div class="value ${isBrokerage ? "portfolio" : "cash"}">${
+              value != null ? formatPrice(value) : "—"
+            }</div>
+          </div>
+          ${extraMetrics}
+        `;
+      }
+
+      function renderHoldings(holdings, basis) {
+        const container = document.getElementById("holdings-container");
+        if (!holdings.length) {
+          container.innerHTML = '<div class="empty">no holdings</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ticker</th>
+                <th class="right">shares</th>
+                <th class="right">cost basis</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${holdings
+                .map(
+                  (h) => `
+                    <tr>
+                      <td class="label-col">${h.ticker}</td>
+                      <td class="right">${formatShares(h.shares)}</td>
+                      <td class="right">${formatPrice(basis[h.ticker] || 0)}</td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function renderActivity(transactions, trades) {
+        const container = document.getElementById("activity-container");
+        const events = [];
+
+        transactions.forEach((t) => {
+          events.push({
+            type: t.type,
+            label: t.type,
+            merchant: t.merchant,
+            amount: t.amount,
+            timestamp: t.timestamp,
+          });
+        });
+        trades.forEach((t) => {
+          events.push({
+            type: t.type,
+            label: `${t.type} ${t.ticker}`,
+            merchant: "--",
+            amount: t.shares * t.price,
+            timestamp: t.timestamp,
+          });
+        });
+
+        events.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1));
+
+        if (!events.length) {
+          container.innerHTML = '<div class="empty">no activity</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>type</th>
+                <th>merchant</th>
+                <th class="right">amount</th>
+                <th class="right">time</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${events
+                .map(
+                  (e) => `
+                    <tr>
+                      <td><span class="pill ${PILL_CLASS[e.type] || ""}">${e.label}</span></td>
+                      <td class="label-col">${e.merchant}</td>
+                      <td class="right">${formatPrice(e.amount)}</td>
+                      <td class="right">${formatTime(e.timestamp)}</td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      async function load() {
+        if (!NAME) {
+          document.getElementById("timestamp").textContent =
+            "error: missing name";
+          return;
+        }
+
+        document.getElementById("account-name").textContent = "iris // " + NAME;
+        document.getElementById("timestamp").textContent = "loading...";
+
+        try {
+          const account = await fetchJson(`/accounts/${NAME}`);
+          const isBrokerage = BROKERAGE_TYPES.has(account.type);
+
+          const [holdings, transactions, trades] = await Promise.all([
+            isBrokerage
+              ? fetchJson(`/accounts/${NAME}/holdings`).catch(() => [])
+              : Promise.resolve([]),
+            fetchJson(`/accounts/${NAME}/transactions`).catch(() => []),
+            isBrokerage
+              ? fetchJson(`/accounts/${NAME}/trades`).catch(() => [])
+              : Promise.resolve([]),
+          ]);
+
+          const basis = costBasisMap(trades);
+
+          document
+            .getElementById("summary")
+            .classList.toggle("two-metric", !isBrokerage);
+          document
+            .getElementById("detail-sections")
+            .classList.toggle("single-col", !isBrokerage);
+          document.getElementById("holdings-section").style.display =
+            isBrokerage ? "" : "none";
+
+          renderSummary(account, account, holdings, basis);
+          if (isBrokerage) {
+            renderHoldings(holdings, basis);
+          }
+          renderActivity(transactions, trades);
+
+          const now = new Date();
+          document.getElementById("timestamp").textContent =
+            "as of " +
+            now.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }) +
+            " · " +
+            now.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            });
+        } catch (e) {
+          document.getElementById("timestamp").textContent =
+            "error: " + e.message;
+        }
+      }
+
+      load();
+    </script>
+  </body>
+</html>

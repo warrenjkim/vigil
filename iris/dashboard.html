@@ -106,6 +106,12 @@
         padding: 1rem 1.25rem;
       }
 
+      .account-card,
+      .account-card:visited,
+      .account-card:hover {
+        text-decoration: none;
+      }
+
       .account-card .account-name {
         font-size: 13px;
         text-transform: uppercase;
@@ -126,6 +132,16 @@
         font-size: 18px;
         font-family: "Computer Modern Typewriter", monospace;
         color: #ebdbb2;
+      }
+
+      .account-card .account-name,
+      .account-card .account-value {
+        transition: color 0.15s ease;
+      }
+
+      .account-card:hover .account-name,
+      .account-card:hover .account-value {
+        color: #689d6a;
       }
 
       .account-card .account-sub {
@@ -406,23 +422,25 @@
 
         grid.innerHTML = accountData
           .map(({ account, detail, holdings, basis }) => {
+            const href = `/accounts/view?name=${encodeURIComponent(account.name)}`;
+
             if (CASH_TYPES.has(account.type)) {
               return `
-                <div class="account-card">
+                <a class="account-card" href="${href}">
                   <div class="account-name">${account.name}</div>
                   <div class="account-type">${account.type}</div>
                   <div class="account-value">${detail.balance != null ? formatPrice(detail.balance) : "—"}</div>
-                </div>
+                </a>
               `;
             }
 
             return `
-              <div class="account-card">
+              <a class="account-card" href="${href}">
                 <div class="account-name">${account.name}</div>
                 <div class="account-type">${account.type}</div>
                 <div class="account-value">${formatPrice(holdings.reduce((s, h) => s + (basis[h.ticker] || 0), 0))}</div>
                 <div class="account-sub">cost basis · ${holdings.length} position${holdings.length !== 1 ? "s" : ""}</div>
-              </div>
+              </a>
             `;
           })
           .join("");
