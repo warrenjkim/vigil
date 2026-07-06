@@ -358,7 +358,7 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 					amount = -amount
 				}
 
-				date, err := time.Parse("2006-01-02", t.Date)
+				date, err := time.ParseInLocation("2006-01-02", t.Date, time.Local)
 				if err != nil {
 					log.Printf("ToVigilAccounts: parse date %q for transaction %q: %v", t.Date, t.TransactionID, err)
 					continue
