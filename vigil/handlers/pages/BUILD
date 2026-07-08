@@ -18,8 +18,11 @@ cc_library(
     deps = [
         "//iris:accounts_detail_html",
         "//iris:accounts_new_html",
+        "//iris:api_js",
         "//iris:dashboard_html",
-        "//iris:iris_html",
+        "//iris:dashboard_js",
+        "//iris:format_js",
+        "//iris:index_html",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:request",
