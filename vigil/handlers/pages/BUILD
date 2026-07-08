@@ -17,6 +17,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//iris:accounts_detail_html",
+        "//iris:accounts_detail_js",
         "//iris:accounts_new_html",
         "//iris:api_js",
         "//iris:dashboard_html",

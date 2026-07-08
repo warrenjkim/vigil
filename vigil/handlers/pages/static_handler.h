@@ -3,6 +3,7 @@
 #include <cstddef>
 
 #include "iris/accounts_detail_html.h"
+#include "iris/accounts_detail_js.h"
 #include "iris/accounts_new_html.h"
 #include "iris/api_js.h"
 #include "iris/dashboard_html.h"
@@ -50,7 +51,9 @@ using StaticScriptFiles = pulse::http::Routes<
     StaticHandler<pulse::http::Method::kGet, "/static/format.js",
                   iris::kFormatJs, "application/javascript">,
     StaticHandler<pulse::http::Method::kGet, "/static/dashboard.js",
-                  iris::kDashboardJs, "application/javascript">>;
+                  iris::kDashboardJs, "application/javascript">,
+    StaticHandler<pulse::http::Method::kGet, "/static/accounts/view.js",
+                  iris::kAccountsDetailJs, "application/javascript">>;
 
 using StaticFileHandlers =
     pulse::http::Routes<StaticSourceFiles, StaticScriptFiles>;
