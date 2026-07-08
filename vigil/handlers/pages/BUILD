@@ -25,6 +25,7 @@ cc_library(
         "//iris:domain_js",
         "//iris:format_js",
         "//iris:index_html",
+        "//iris:iris_css",
         "@pulse//pulse/http:handler",
         "@pulse//pulse/http:method",
         "@pulse//pulse/http:request",

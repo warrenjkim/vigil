@@ -1,0 +1,197 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Computer Modern Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #dddddd;
+  background-color: #151515;
+  padding: 4rem 6rem;
+}
+
+h1 {
+  font-size: 28px;
+  text-transform: uppercase;
+  font-weight: lighter;
+  letter-spacing: 0.1em;
+  color: #dddddd;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #665c54;
+  margin-bottom: 1.75rem;
+}
+
+hr {
+  border: none;
+  height: 0.1em;
+  background-color: #50665a;
+  margin-bottom: 1.5rem;
+}
+
+.nav {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav a {
+  color: #665c54;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: #a89984;
+}
+
+.nav a.active {
+  color: #8bb39d;
+}
+
+.section-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #8bb39d;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #3c3836;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button.refresh {
+  background: #1d2021;
+  border: 1px solid #3c3836;
+  color: #665c54;
+  font-family: "Computer Modern Sans", sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+
+button.refresh:hover {
+  color: #a89984;
+  border-color: #665c54;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.metric {
+  background: #1d2021;
+  border: 1px solid #3c3836;
+  padding: 1rem 1.25rem;
+}
+
+.metric .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #665c54;
+  margin-bottom: 0.4rem;
+}
+
+.metric .value {
+  font-size: 22px;
+  font-family: "Computer Modern Typewriter", monospace;
+  color: #ebdbb2;
+}
+
+.metric .value.cash {
+  color: #98971a;
+}
+.metric .value.portfolio {
+  color: #689d6a;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #665c54;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #3c3836;
+}
+
+td {
+  padding: 0.4rem 0.5rem;
+  font-size: 13px;
+  font-family: "Computer Modern Typewriter", monospace;
+  border-bottom: 1px solid #232323;
+}
+
+th.right,
+td.right {
+  text-align: right;
+}
+
+td.label-col {
+  font-family: "Computer Modern Sans", sans-serif;
+  color: #d5c4a1;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid;
+}
+
+.pill.buy,
+.pill.deposit {
+  color: #98971a;
+  border-color: #98971a;
+}
+
+.pill.sell,
+.pill.withdrawal {
+  color: #cc241d;
+  border-color: #cc241d;
+}
+
+.loading {
+  color: #665c54;
+  font-size: 13px;
+  font-family: "Computer Modern Typewriter", monospace;
+  padding: 0.5rem 0;
+}
+
+.empty {
+  color: #665c54;
+  font-size: 13px;
+  font-family: "Computer Modern Typewriter", monospace;
+  padding: 0.5rem 0;
+}
