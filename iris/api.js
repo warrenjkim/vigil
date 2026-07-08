@@ -1,3 +1,4 @@
+const BASE = "";
 async function fetchJson(path) {
   const response = await fetch(BASE + path);
   if (!response.ok) {

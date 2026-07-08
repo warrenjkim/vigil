@@ -21,6 +21,7 @@ cc_library(
         "//iris:api_js",
         "//iris:dashboard_html",
         "//iris:dashboard_js",
+        "//iris:domain_js",
         "//iris:format_js",
         "//iris:index_html",
         "@pulse//pulse/http:handler",

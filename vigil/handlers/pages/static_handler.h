@@ -7,6 +7,7 @@
 #include "iris/api_js.h"
 #include "iris/dashboard_html.h"
 #include "iris/dashboard_js.h"
+#include "iris/domain_js.h"
 #include "iris/format_js.h"
 #include "iris/index_html.h"
 #include "pulse/http/handler.h"
@@ -42,6 +43,8 @@ using StaticSourceFiles = pulse::http::Routes<
                   iris::kAccountsDetailHtml, "text/html">>;
 
 using StaticScriptFiles = pulse::http::Routes<
+    StaticHandler<pulse::http::Method::kGet, "/static/domain.js",
+                  iris::kDomainJs, "application/javascript">,
     StaticHandler<pulse::http::Method::kGet, "/static/api.js", iris::kApiJs,
                   "application/javascript">,
     StaticHandler<pulse::http::Method::kGet, "/static/format.js",
