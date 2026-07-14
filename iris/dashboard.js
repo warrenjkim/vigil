@@ -1,3 +1,12 @@
+import {
+  CASH_TYPES,
+  BROKERAGE_TYPES,
+  PILL_CLASS,
+  costBasisMap,
+} from "/static/domain.js";
+import { formatPrice, formatShares, formatDate } from "/static/format.js";
+import { fetchJson } from "/static/api.js";
+
 const ACTIVITY_LIMIT = 10;
 
 function renderSummary(accountData) {
@@ -38,7 +47,7 @@ function renderAccounts(accountData) {
 
   grid.innerHTML = accountData
     .map(({ account, detail, holdings, basis }) => {
-      const href = `/accounts/view?name=${encodeURIComponent(account.name)}`;
+      const href = `/accounts/detail?name=${encodeURIComponent(account.name)}`;
 
       if (CASH_TYPES.has(account.type)) {
         return `
@@ -239,4 +248,5 @@ async function load() {
   }
 }
 
+document.getElementById("refresh-button").addEventListener("click", load);
 document.addEventListener("DOMContentLoaded", load);

@@ -1,4 +1,4 @@
-function formatPrice(n) {
+export function formatPrice(n) {
   return (
     "$" +
     Number(n).toLocaleString("en-US", {
@@ -8,14 +8,14 @@ function formatPrice(n) {
   );
 }
 
-function formatShares(n) {
+export function formatShares(n) {
   return Number(n).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 6,
   });
 }
 
-function formatDate(ts) {
+export function formatDate(ts) {
   return new Date(ts).toLocaleDateString("en-US", {
     month: "numeric",
     day: "numeric",

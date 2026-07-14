@@ -41,7 +41,7 @@ using StaticSourceFiles = pulse::http::Routes<
                   "text/html">,
     StaticHandler<pulse::http::Method::kGet, "/accounts/new",
                   iris::kAccountsNewHtml, "text/html">,
-    StaticHandler<pulse::http::Method::kGet, "/accounts/view",
+    StaticHandler<pulse::http::Method::kGet, "/accounts/detail",
                   iris::kAccountsDetailHtml, "text/html">>;
 
 using StaticScriptFiles = pulse::http::Routes<
@@ -55,7 +55,7 @@ using StaticScriptFiles = pulse::http::Routes<
                   iris::kFormatJs, "application/javascript">,
     StaticHandler<pulse::http::Method::kGet, "/static/dashboard.js",
                   iris::kDashboardJs, "application/javascript">,
-    StaticHandler<pulse::http::Method::kGet, "/static/accounts/view.js",
+    StaticHandler<pulse::http::Method::kGet, "/static/accounts/detail.js",
                   iris::kAccountsDetailJs, "application/javascript">>;
 
 using StaticFileHandlers =

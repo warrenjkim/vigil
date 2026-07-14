@@ -1,3 +1,7 @@
+import { BROKERAGE_TYPES, PILL_CLASS, costBasisMap } from "/static/domain.js";
+import { formatPrice, formatShares, formatDate } from "/static/format.js";
+import { fetchJson } from "/static/api.js";
+
 const NAME = new URLSearchParams(window.location.search).get("name");
 
 function renderSummary(account, detail, holdings, basis) {
@@ -186,4 +190,5 @@ async function load() {
   }
 }
 
+document.getElementById("refresh-button").addEventListener("click", load);
 document.addEventListener("DOMContentLoaded", load);
