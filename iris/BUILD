@@ -1,3 +1,4 @@
+load(":bundle.bzl", "bundle")
 load(":embed.bzl", "embed_file")
 
 [
@@ -15,3 +16,43 @@ load(":embed.bzl", "embed_file")
         exclude = [],
     )
 ]
+
+filegroup(
+    name = "common_js",
+    srcs = [
+        "api.js",
+        "domain.js",
+        "format.js",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bundle(
+    name = "index",
+    html = "index.html",
+)
+
+bundle(
+    name = "dashboard",
+    css = "iris.css",
+    html = "dashboard.html",
+    js = [
+        "dashboard.js",
+        ":common_js",
+    ],
+)
+
+bundle(
+    name = "accounts_detail",
+    css = "iris.css",
+    html = "accounts/detail.html",
+    js = [
+        "accounts/detail.js",
+        ":common_js",
+    ],
+)
+
+bundle(
+    name = "accounts_new",
+    html = "accounts/new.html",
+)
