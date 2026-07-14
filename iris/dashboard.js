@@ -145,7 +145,6 @@ function renderActivity(accountData) {
   });
 
   events.sort((a, b) => (b.timestamp > a.timestamp ? 1 : -1));
-  console.log(events);
 
   const recent = events.slice(0, ACTIVITY_LIMIT);
   if (!recent.length) {
