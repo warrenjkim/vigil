@@ -1,4 +1,4 @@
-load(":bundle.bzl", "bundle")
+load(":defs.bzl", "bundle")
 load(":embed.bzl", "embed_file")
 
 [
