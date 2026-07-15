@@ -41,3 +41,9 @@ CREATE TABLE Trades (
   TradeTimestamp INTEGER NOT NULL,
   CommitTimestamp INTEGER NOT NULL
 );
+
+-- display names for the ui
+CREATE TABLE MerchantAliases (
+  RawMerchant TEXT PRIMARY KEY,
+  DisplayName TEXT NOT NULL
+);
