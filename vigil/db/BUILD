@@ -177,6 +177,44 @@ cc_test(
 )
 
 cc_library(
+    name = "merchant_alias",
+    hdrs = ["merchant_alias.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
+    name = "merchant_aliases_dao",
+    srcs = ["merchant_aliases_dao.cc"],
+    hdrs = ["merchant_aliases_dao.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":database",
+        ":merchant_alias",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_test(
+    name = "merchant_aliases_dao_test",
+    srcs = ["merchant_aliases_dao_test.cc"],
+    deps = [
+        ":database",
+        ":merchant_alias",
+        ":merchant_aliases_dao",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:result",
+    ],
+)
+
+cc_library(
     name = "trade",
     hdrs = ["trade.h"],
     visibility = ["//visibility:public"],
