@@ -9,6 +9,7 @@
 #include "vigil/db/accounts_dao.h"
 #include "vigil/db/database.h"
 #include "vigil/db/holdings_dao.h"
+#include "vigil/db/merchant_aliases_dao.h"
 #include "vigil/db/trades_dao.h"
 #include "vigil/db/transactions_dao.h"
 #include "vigil/handlers/api/accounts/create_account_handler.h"
@@ -17,6 +18,8 @@
 #include "vigil/handlers/api/accounts/list_accounts_handler.h"
 #include "vigil/handlers/api/holdings/get_holding_handler.h"
 #include "vigil/handlers/api/holdings/list_holdings_handler.h"
+#include "vigil/handlers/api/merchant_aliases/create_merchant_alias_handler.h"
+#include "vigil/handlers/api/merchant_aliases/list_merchant_aliases_handler.h"
 #include "vigil/handlers/api/trades/create_trade_handler.h"
 #include "vigil/handlers/api/trades/list_trades_handler.h"
 #include "vigil/handlers/api/transactions/import_transactions_handler.h"
@@ -59,6 +62,10 @@ using TradeHandlers =
 using HoldingHandlers =
     pulse::http::Routes<vigil::ListHoldingsHandler, vigil::GetHoldingHandler>;
 
+using MerchantAliasHandlers =
+    pulse::http::Routes<vigil::CreateMerchantAliasHandler,
+                        vigil::ListMerchantAliasesHandler>;
+
 int main(int argc, char** argv) {
   vigil::Database db = pulse::UnwrapOrDie(
       vigil::Database::Open(GetFlag(argc, argv, "--db", "vigil.db")));
@@ -67,6 +74,7 @@ int main(int argc, char** argv) {
   vigil::AccountsDao accounts_dao(db);
   vigil::TransactionsDao transactions_dao(db);
   vigil::HoldingsDao holdings_dao(db);
+  vigil::MerchantAliasesDao merchant_aliases_dao(db);
   vigil::TradesDao trades_dao(db);
   vigil::AccountService account_service(&accounts_dao, &transactions_dao);
   vigil::TradeService trade_service(&db, &trades_dao, &holdings_dao);
@@ -74,13 +82,14 @@ int main(int argc, char** argv) {
                                                 &transactions_dao);
 
   pulse::http::ServerContext<vigil::AccountsDao*, vigil::TransactionsDao*,
-                             vigil::HoldingsDao*, vigil::TradesDao*,
-                             vigil::AccountService*, vigil::TradeService*,
-                             vigil::TransactionService*>
+                             vigil::HoldingsDao*, vigil::MerchantAliasesDao*,
+                             vigil::TradesDao*, vigil::AccountService*,
+                             vigil::TradeService*, vigil::TransactionService*>
       ctx;
   ctx.set(&accounts_dao);
   ctx.set(&transactions_dao);
   ctx.set(&holdings_dao);
+  ctx.set(&merchant_aliases_dao);
   ctx.set(&trades_dao);
 
   ctx.set(&account_service);
@@ -91,7 +100,7 @@ int main(int argc, char** argv) {
       pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
               StaticHandlers, AccountHandlers, TransactionHandlers,
-              TradeHandlers, HoldingHandlers>>(ctx)),
+              TradeHandlers, HoldingHandlers, MerchantAliasHandlers>>(ctx)),
       {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
   server.Run();
 
