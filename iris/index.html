@@ -411,6 +411,40 @@
     </div>
 
     <div class="section">
+      <h2>merchant aliases</h2>
+      <table>
+        <tr>
+          <td class="path">/merchant-aliases</td>
+          <td>
+            <div class="inputs">
+              <button class="get" onclick="get('/merchant-aliases')">
+                GET
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="path">/merchant-aliases</td>
+          <td>
+            <div class="inputs">
+              <input id="create-alias-merchant" placeholder="merchant" />
+              <input
+                id="create-alias-display-name"
+                placeholder="display name"
+              />
+              <button
+                class="post"
+                onclick="post('/merchant-aliases', { merchant: val('create-alias-merchant'), display_name: val('create-alias-display-name') })"
+              >
+                POST
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section">
       <h2>response</h2>
       <pre id="out">—</pre>
     </div>
