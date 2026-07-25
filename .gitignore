@@ -3,3 +3,5 @@
 **/compile_commands.json
 external/
 **/.DS_Store
+**/plaid-config.json
+**/seed.csv
