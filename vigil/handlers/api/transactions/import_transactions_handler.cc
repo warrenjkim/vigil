@@ -14,6 +14,7 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
+#include "pulse/reflect/schema.h"
 #include "vigil/db/time.h"
 #include "vigil/db/transaction.h"
 #include "vigil/services/transaction_service.h"
@@ -29,8 +30,8 @@ struct ImportTransactionRequest {
   std::string merchant;
   int64_t transaction_timestamp;
 
-  static constexpr auto schema() {
-    return pulse::json::Schema<ImportTransactionRequest>{}
+  static constexpr auto Schema() {
+    return pulse::reflect::Schema<ImportTransactionRequest>{}
         .Field("external_id", &ImportTransactionRequest::external_id)
         .Field("type", &ImportTransactionRequest::type)
         .Field("amount", &ImportTransactionRequest::amount)

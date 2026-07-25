@@ -11,6 +11,7 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
+#include "pulse/reflect/schema.h"
 #include "vigil/db/merchant_aliases_dao.h"
 
 namespace vigil {
@@ -21,8 +22,8 @@ struct CreateMerchantAliasRequest {
   std::string merchant;
   std::string display_name;
 
-  static constexpr auto schema() {
-    return pulse::json::Schema<CreateMerchantAliasRequest>{}
+  static constexpr auto Schema() {
+    return pulse::reflect::Schema<CreateMerchantAliasRequest>{}
         .Field("merchant", &CreateMerchantAliasRequest::merchant)
         .Field("display_name", &CreateMerchantAliasRequest::display_name);
   }

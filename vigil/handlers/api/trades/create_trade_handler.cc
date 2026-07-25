@@ -13,6 +13,7 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
+#include "pulse/reflect/schema.h"
 #include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/services/trade_service.h"
@@ -29,8 +30,8 @@ struct CreateTradeRequest {
   std::optional<std::string> description;
   int64_t trade_timestamp;
 
-  static constexpr auto schema() {
-    return pulse::json::Schema<CreateTradeRequest>{}
+  static constexpr auto Schema() {
+    return pulse::reflect::Schema<CreateTradeRequest>{}
         .Field("type", &CreateTradeRequest::type)
         .Field("ticker", &CreateTradeRequest::ticker)
         .Field("shares", &CreateTradeRequest::shares)

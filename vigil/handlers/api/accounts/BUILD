@@ -18,6 +18,7 @@ cc_library(
         "@pulse//pulse/json:bind",
         "@pulse//pulse/json:parse",
         "@pulse//pulse/json:value",
+        "@pulse//pulse/reflect:schema",
         "@pulse//pulse/strings:cat",
     ],
 )
