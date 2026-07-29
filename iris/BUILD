@@ -56,3 +56,9 @@ bundle(
     name = "accounts_new",
     html = "accounts/new.html",
 )
+
+bundle(
+    name = "console",
+    css = "console.css",
+    js = "console.js",
+)

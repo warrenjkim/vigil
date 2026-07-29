@@ -44,8 +44,7 @@ const char* GetFlag(int argc, char** argv, const char* flag,
   return default_value;
 }
 
-using StaticHandlers =
-    pulse::http::Routes<vigil::HealthHandler, vigil::StaticFileHandlers>;
+using StaticHandlers = pulse::http::Routes<vigil::StaticFileHandlers>;
 
 using AccountHandlers =
     pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
@@ -65,6 +64,10 @@ using HoldingHandlers =
 using MerchantAliasHandlers =
     pulse::http::Routes<vigil::CreateMerchantAliasHandler,
                         vigil::ListMerchantAliasesHandler>;
+
+using ApiRoutes = pulse::http::Routes<vigil::HealthHandler, AccountHandlers,
+                                      TransactionHandlers, TradeHandlers,
+                                      HoldingHandlers, MerchantAliasHandlers>;
 
 int main(int argc, char** argv) {
   vigil::Database db = pulse::UnwrapOrDie(

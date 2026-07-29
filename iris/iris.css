@@ -3,7 +3,6 @@
   margin: 0;
   padding: 0;
 }
-
 body {
   font-family: "Computer Modern Sans", sans-serif;
   font-size: 16px;
@@ -12,7 +11,6 @@ body {
   background-color: #151515;
   padding: 4rem 6rem;
 }
-
 h1 {
   font-size: 28px;
   text-transform: uppercase;
@@ -21,7 +19,6 @@ h1 {
   color: #dddddd;
   margin-bottom: 0.25rem;
 }
-
 .subtitle {
   font-size: 12px;
   text-transform: uppercase;
@@ -29,7 +26,6 @@ h1 {
   color: #665c54;
   margin-bottom: 1.75rem;
 }
-
 hr {
   border: none;
   height: 0.1em;
@@ -45,16 +41,13 @@ hr {
   display: flex;
   gap: 1.5rem;
 }
-
 .nav a {
   color: #665c54;
   text-decoration: none;
 }
-
 .nav a:hover {
   color: #a89984;
 }
-
 .nav a.active {
   color: #8bb39d;
 }
@@ -72,7 +65,6 @@ hr {
   justify-content: space-between;
   align-items: center;
 }
-
 button.refresh {
   background: #1d2021;
   border: 1px solid #3c3836;
@@ -84,7 +76,6 @@ button.refresh {
   padding: 0.2rem 0.6rem;
   cursor: pointer;
 }
-
 button.refresh:hover {
   color: #a89984;
   border-color: #665c54;
@@ -95,13 +86,11 @@ button.refresh:hover {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
-
 .metric {
   background: #1d2021;
   border: 1px solid #3c3836;
   padding: 1rem 1.25rem;
 }
-
 .metric .label {
   font-size: 11px;
   text-transform: uppercase;
@@ -109,13 +98,11 @@ button.refresh:hover {
   color: #665c54;
   margin-bottom: 0.4rem;
 }
-
 .metric .value {
   font-size: 22px;
   font-family: "Computer Modern Typewriter", monospace;
   color: #ebdbb2;
 }
-
 .metric .value.cash {
   color: #98971a;
 }
@@ -133,7 +120,6 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
-
 th {
   text-align: left;
   font-size: 11px;
@@ -143,19 +129,16 @@ th {
   padding: 0.4rem 0.5rem;
   border-bottom: 1px solid #3c3836;
 }
-
 td {
   padding: 0.4rem 0.5rem;
   font-size: 13px;
   font-family: "Computer Modern Typewriter", monospace;
   border-bottom: 1px solid #232323;
 }
-
 th.right,
 td.right {
   text-align: right;
 }
-
 td.label-col {
   font-family: "Computer Modern Sans", sans-serif;
   color: #d5c4a1;
@@ -169,13 +152,11 @@ td.label-col {
   padding: 0.1rem 0.4rem;
   border: 1px solid;
 }
-
 .pill.buy,
 .pill.deposit {
   color: #98971a;
   border-color: #98971a;
 }
-
 .pill.sell,
 .pill.withdrawal {
   color: #cc241d;
@@ -188,7 +169,6 @@ td.label-col {
   font-family: "Computer Modern Typewriter", monospace;
   padding: 0.5rem 0;
 }
-
 .empty {
   color: #665c54;
   font-size: 13px;

@@ -1,4 +1,24 @@
 cc_library(
+    name = "console_handler",
+    hdrs = ["console_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//iris:console_css",
+        "//iris:console_js",
+        "@pulse//pulse/core:type_list",
+        "@pulse//pulse/html:attributes",
+        "@pulse//pulse/html:element",
+        "@pulse//pulse/html:tags",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/http:router",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
     name = "health_handler",
     srcs = ["health_handler.cc"],
     hdrs = ["health_handler.h"],
