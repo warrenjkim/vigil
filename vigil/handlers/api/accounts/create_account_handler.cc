@@ -13,7 +13,6 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
-#include "pulse/reflect/schema.h"
 #include "pulse/strings/cat.h"
 #include "vigil/db/account.h"
 #include "vigil/db/accounts_dao.h"
@@ -21,17 +20,6 @@
 namespace vigil {
 
 namespace {
-
-struct CreateAccountRequest {
-  std::string name;
-  std::string type;
-
-  static constexpr auto Schema() {
-    return pulse::reflect::Schema<CreateAccountRequest>{}
-        .Field("name", &CreateAccountRequest::name)
-        .Field("type", &CreateAccountRequest::type);
-  }
-};
 
 struct Parsed {
   bool is_form = false;

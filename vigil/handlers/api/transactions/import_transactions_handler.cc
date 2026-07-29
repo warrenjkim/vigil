@@ -1,6 +1,5 @@
 #include "vigil/handlers/api/transactions/import_transactions_handler.h"
 
-#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,34 +13,11 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
-#include "pulse/reflect/schema.h"
 #include "vigil/db/time.h"
 #include "vigil/db/transaction.h"
 #include "vigil/services/transaction_service.h"
 
 namespace vigil {
-
-namespace {
-
-struct ImportTransactionRequest {
-  std::string external_id;
-  std::string type;
-  double amount;
-  std::string merchant;
-  int64_t transaction_timestamp;
-
-  static constexpr auto Schema() {
-    return pulse::reflect::Schema<ImportTransactionRequest>{}
-        .Field("external_id", &ImportTransactionRequest::external_id)
-        .Field("type", &ImportTransactionRequest::type)
-        .Field("amount", &ImportTransactionRequest::amount)
-        .Field("merchant", &ImportTransactionRequest::merchant)
-        .Field("transaction_timestamp",
-               &ImportTransactionRequest::transaction_timestamp);
-  }
-};
-
-}  // namespace
 
 ImportTransactionsHandler::ImportTransactionsHandler(
     TransactionService* transaction_service)

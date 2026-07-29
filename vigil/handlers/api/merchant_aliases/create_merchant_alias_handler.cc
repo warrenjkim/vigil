@@ -1,6 +1,5 @@
 #include "vigil/handlers/api/merchant_aliases/create_merchant_alias_handler.h"
 
-#include <string>
 #include <utility>
 
 #include "pulse/core/error.h"
@@ -11,25 +10,9 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
-#include "pulse/reflect/schema.h"
 #include "vigil/db/merchant_aliases_dao.h"
 
 namespace vigil {
-
-namespace {
-
-struct CreateMerchantAliasRequest {
-  std::string merchant;
-  std::string display_name;
-
-  static constexpr auto Schema() {
-    return pulse::reflect::Schema<CreateMerchantAliasRequest>{}
-        .Field("merchant", &CreateMerchantAliasRequest::merchant)
-        .Field("display_name", &CreateMerchantAliasRequest::display_name);
-  }
-};
-
-}  // namespace
 
 pulse::http::Response CreateMerchantAliasHandler::operator()(
     const pulse::http::Request& request) const {

@@ -1,6 +1,5 @@
 #include "vigil/handlers/api/trades/create_trade_handler.h"
 
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <utility>
@@ -13,35 +12,11 @@
 #include "pulse/json/bind.h"
 #include "pulse/json/parse.h"
 #include "pulse/json/value.h"
-#include "pulse/reflect/schema.h"
 #include "vigil/db/time.h"
 #include "vigil/db/trade.h"
 #include "vigil/services/trade_service.h"
 
 namespace vigil {
-
-namespace {
-
-struct CreateTradeRequest {
-  std::string type;
-  std::string ticker;
-  double shares;
-  double price;
-  std::optional<std::string> description;
-  int64_t trade_timestamp;
-
-  static constexpr auto Schema() {
-    return pulse::reflect::Schema<CreateTradeRequest>{}
-        .Field("type", &CreateTradeRequest::type)
-        .Field("ticker", &CreateTradeRequest::ticker)
-        .Field("shares", &CreateTradeRequest::shares)
-        .Field("price", &CreateTradeRequest::price)
-        .Field("description", &CreateTradeRequest::description)
-        .Field("trade_timestamp", &CreateTradeRequest::trade_timestamp);
-  }
-};
-
-}  // namespace
 
 pulse::http::Response CreateTradeHandler::operator()(
     const pulse::http::Request& request) const {

@@ -24,6 +24,7 @@
 #include "vigil/handlers/api/trades/list_trades_handler.h"
 #include "vigil/handlers/api/transactions/import_transactions_handler.h"
 #include "vigil/handlers/api/transactions/list_transactions_handler.h"
+#include "vigil/handlers/pages/console_handler.h"
 #include "vigil/handlers/pages/health_handler.h"
 #include "vigil/handlers/pages/static_handler.h"
 #include "vigil/services/account_service.h"
@@ -102,8 +103,8 @@ int main(int argc, char** argv) {
   pulse::http::Server server(
       pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
-              StaticHandlers, AccountHandlers, TransactionHandlers,
-              TradeHandlers, HoldingHandlers, MerchantAliasHandlers>>(ctx)),
+              StaticHandlers, ApiRoutes, vigil::ConsoleHandler<ApiRoutes>>>(
+              ctx)),
       {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
   server.Run();
 
