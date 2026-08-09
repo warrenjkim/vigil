@@ -28,11 +28,6 @@ filegroup(
 )
 
 bundle(
-    name = "index",
-    html = "index.html",
-)
-
-bundle(
     name = "dashboard",
     css = "iris.css",
     html = "dashboard.html",

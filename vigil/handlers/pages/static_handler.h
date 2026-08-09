@@ -10,7 +10,6 @@
 #include "iris/dashboard_js.h"
 #include "iris/domain_js.h"
 #include "iris/format_js.h"
-#include "iris/index_html.h"
 #include "iris/iris_css.h"
 #include "pulse/http/handler.h"
 #include "pulse/http/method.h"
@@ -35,8 +34,6 @@ class StaticHandler final
 };
 
 using StaticSourceFiles = pulse::http::Routes<
-    StaticHandler<pulse::http::Method::kGet, "/", iris::kIndexHtml,
-                  "text/html">,
     StaticHandler<pulse::http::Method::kGet, "/dashboard", iris::kDashboardHtml,
                   "text/html">,
     StaticHandler<pulse::http::Method::kGet, "/accounts/new",
