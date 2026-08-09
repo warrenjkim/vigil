@@ -18,6 +18,7 @@ var (
 	plaidBaseURL    = flag.String("plaid_base_url", "https://production.plaid.com", "Plaid base URL")
 	vigilBaseURL    = flag.String("vigil_base_url", "http://localhost:8080", "Vigil server base URL")
 	vigilSeedFile   = flag.String("vigil_seed_file", "", "Path to a CSV of seed transactions to import; empty = skip seeding")
+	vigilMode       = flag.Bool("vigil_mode", false, "Only print response codes to stdout")
 )
 
 type JSONFloat64 float64
@@ -71,64 +72,77 @@ type VigilAccount struct {
 
 func main() {
 	flag.Parse()
-	log.Println("conduit: starting")
+	Info("conduit: starting")
 
 	ctx, err := loadPlaidContext(*plaidConfigPath)
 	if err != nil {
-		log.Fatalf("loading plaid-cli config: %v", err)
+		Fatalf("loading plaid-cli config: %v", err)
 	}
-	log.Printf("conduit: loaded config (env=%s, items=%d)", ctx.Items[0].Alias, len(ctx.Items))
+	Infof("conduit: loaded config (env=%s, items=%d)", ctx.Items[0].Alias, len(ctx.Items))
 
-	log.Println("conduit: fetching plaid accounts")
+	Info("conduit: fetching plaid accounts")
 	if err := GetAccounts(ctx); err != nil {
-		log.Fatalf("getting accounts: %v", err)
+		Fatalf("getting accounts: %v", err)
 	}
 
-	log.Println("conduit: running incremental sync")
+	Info("conduit: running incremental sync")
 	if err := SyncTransactions(ctx); err != nil {
-		log.Fatalf("syncing transactions: %v", err)
+		Fatalf("syncing transactions: %v", err)
 	}
 
-	log.Println("conduit: transforming to vigil accounts")
+	Info("conduit: transforming to vigil accounts")
 	vigilAccounts, err := ToVigilAccounts(ctx)
 	if err != nil {
-		log.Fatalf("transforming accounts: %v", err)
+		Fatalf("transforming accounts: %v", err)
 	}
-	log.Printf("conduit: transformed %d vigil accounts", len(vigilAccounts))
+	Infof("conduit: transformed %d vigil accounts", len(vigilAccounts))
 
-	if err := SeedVigil(vigilEpoch, *vigilSeedFile); err != nil {
-		log.Fatalf("seeding: %v", err)
-	}
-
-	log.Println("conduit: syncing to vigil")
-	if err := SyncToVigil(vigilAccounts); err != nil {
-		log.Fatalf("syncing to vigil: %v", err)
+	Info("conduit: syncing to vigil")
+	imported, err := SyncToVigil(vigilAccounts)
+	if err != nil {
+		Fatalf("syncing to vigil: %v", err)
 	}
 
-	log.Println("conduit: done")
+	Info("conduit: done")
+	if *vigilMode {
+		summary, err := json.Marshal(map[string]int{"imported": imported})
+		if err != nil {
+			Fatalf("marshal summary: %v", err)
+		}
+		fmt.Println(string(summary))
+	}
 }
 
-func SyncToVigil(accounts map[string]*VigilAccount) error {
+func SyncToVigil(accounts map[string]*VigilAccount) (int, error) {
 	for _, acc := range accounts {
-		log.Printf("SyncToVigil: processing account %q", acc.Name)
-
+		Infof("SyncToVigil: ensuring account %q exists", acc.Name)
 		if err := EnsureVigilAccount(acc); err != nil {
-			return fmt.Errorf("ensure account %q: %w", acc.Name, err)
+			return 0, fmt.Errorf("ensure account %q: %w", acc.Name, err)
 		}
+	}
+
+	total, err := SeedVigil(vigilEpoch, *vigilSeedFile)
+	if err != nil {
+		Fatalf("seeding: %v", err)
+	}
+
+	for _, acc := range accounts {
+		Infof("SyncToVigil: processing account %q", acc.Name)
 
 		imported, err := ImportVigilTransactions(acc)
 		if err != nil {
-			return fmt.Errorf("import transactions for %q: %w", acc.Name, err)
+			return 0, fmt.Errorf("import transactions for %q: %w", acc.Name, err)
 		}
 
-		log.Printf("SyncToVigil: imported %d transactions into %q", imported, acc.Name)
+		Infof("SyncToVigil: imported %d transactions into %q", imported, acc.Name)
+		total += imported
 	}
 
-	return nil
+	return total, nil
 }
 
 func EnsureVigilAccount(acc *VigilAccount) error {
-	log.Printf("EnsureVigilAccount: checking if %q exists", acc.Name)
+	Infof("EnsureVigilAccount: checking if %q exists", acc.Name)
 
 	resp, err := http.Get(fmt.Sprintf("%s/accounts/%s", *vigilBaseURL, acc.Name))
 	if err != nil {
@@ -137,7 +151,7 @@ func EnsureVigilAccount(acc *VigilAccount) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		log.Printf("EnsureVigilAccount: %q already exists", acc.Name)
+		Infof("EnsureVigilAccount: %q already exists", acc.Name)
 		return nil
 	}
 
@@ -145,7 +159,7 @@ func EnsureVigilAccount(acc *VigilAccount) error {
 		return fmt.Errorf("get account returned unexpected status %d", resp.StatusCode)
 	}
 
-	log.Printf("EnsureVigilAccount: creating %q (type=%s)", acc.Name, acc.Type)
+	Infof("EnsureVigilAccount: creating %q (type=%s)", acc.Name, acc.Type)
 
 	body, err := json.Marshal(map[string]string{
 		"name": acc.Name,
@@ -169,17 +183,17 @@ func EnsureVigilAccount(acc *VigilAccount) error {
 		return fmt.Errorf("create account returned unexpected status %d", createResp.StatusCode)
 	}
 
-	log.Printf("EnsureVigilAccount: created %q (%s)", acc.Name, acc.Type)
+	Infof("EnsureVigilAccount: created %q (%s)", acc.Name, acc.Type)
 	return nil
 }
 
 func ImportVigilTransactions(acc *VigilAccount) (int, error) {
 	if len(acc.Transactions) == 0 {
-		log.Printf("ImportVigilTransactions: no transactions for %q, skipping", acc.Name)
+		Infof("ImportVigilTransactions: no transactions for %q, skipping", acc.Name)
 		return 0, nil
 	}
 
-	log.Printf("ImportVigilTransactions: importing %d transactions into %q", len(acc.Transactions), acc.Name)
+	Infof("ImportVigilTransactions: importing %d transactions into %q", len(acc.Transactions), acc.Name)
 
 	body, err := json.Marshal(acc.Transactions)
 	if err != nil {
@@ -205,7 +219,7 @@ func ImportVigilTransactions(acc *VigilAccount) (int, error) {
 		return 0, fmt.Errorf("decode import response: %w", err)
 	}
 
-	log.Printf("ImportVigilTransactions: server reported %d newly imported for %q", result["imported"], acc.Name)
+	Infof("ImportVigilTransactions: server reported %d newly imported for %q", result["imported"], acc.Name)
 	return result["imported"], nil
 }
 
@@ -222,7 +236,7 @@ func GetAccounts(ctx *PlaidContext) error {
 
 	for i := range ctx.Items {
 		item := &ctx.Items[i]
-		log.Printf("GetAccounts: fetching accounts for item %q", item.Alias)
+		Infof("GetAccounts: fetching accounts for item %q", item.Alias)
 
 		resp, err := Call[GetAccountRequest, GetAccountResponse](
 			"/accounts/get",
@@ -240,7 +254,7 @@ func GetAccounts(ctx *PlaidContext) error {
 			item.Accounts[account.AccountID] = account
 		}
 
-		log.Printf("GetAccounts: item %q has %d accounts", item.Alias, len(item.Accounts))
+		Infof("GetAccounts: item %q has %d accounts", item.Alias, len(item.Accounts))
 	}
 
 	return nil
@@ -262,7 +276,7 @@ func SyncTransactions(ctx *PlaidContext) error {
 
 	for i := range ctx.Items {
 		item := &ctx.Items[i]
-		log.Printf("SyncTransactions: syncing item %q (cursor=%q)", item.Alias, item.SyncCursor)
+		Infof("SyncTransactions: syncing item %q (cursor=%q)", item.Alias, item.SyncCursor)
 
 		cursor := item.SyncCursor
 		page := 0
@@ -279,7 +293,7 @@ func SyncTransactions(ctx *PlaidContext) error {
 				return err
 			}
 
-			log.Printf("SyncTransactions: page %d -- %d added for item %q", page, len(resp.Added), item.Alias)
+			Infof("SyncTransactions: page %d -- %d added for item %q", page, len(resp.Added), item.Alias)
 
 			for _, t := range resp.Added {
 				if t.Pending {
@@ -288,7 +302,7 @@ func SyncTransactions(ctx *PlaidContext) error {
 
 				account, ok := item.Accounts[t.AccountID]
 				if !ok {
-					log.Printf("SyncTransactions: unknown account_id %q, skipping transaction %q", t.AccountID, t.TransactionID)
+					Infof("SyncTransactions: unknown account_id %q, skipping transaction %q", t.AccountID, t.TransactionID)
 					continue
 				}
 
@@ -304,7 +318,7 @@ func SyncTransactions(ctx *PlaidContext) error {
 		}
 
 		item.SyncCursor = cursor
-		log.Printf("SyncTransactions: item %q done (new cursor=%q)", item.Alias, item.SyncCursor)
+		Infof("SyncTransactions: item %q done (new cursor=%q)", item.Alias, item.SyncCursor)
 	}
 
 	return nil
@@ -328,7 +342,7 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 	for _, item := range ctx.Items {
 		prefix, ok := prefixes[item.Alias]
 		if !ok {
-			log.Printf("ToVigilAccounts: no prefix mapped for plaid item %q, skipping", item.Alias)
+			Infof("ToVigilAccounts: no prefix mapped for plaid item %q, skipping", item.Alias)
 			continue
 		}
 
@@ -336,7 +350,7 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 			vigilName := prefix + plaidAccount.Name
 			accountType, ok := accountTypes[plaidAccount.Type]
 			if !ok {
-				log.Printf("ToVigilAccounts: no account type mapped for plaid account %q, skipping", vigilName)
+				Infof("ToVigilAccounts: no account type mapped for plaid account %q, skipping", vigilName)
 				continue
 			}
 
@@ -356,7 +370,7 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 
 				date, err := time.ParseInLocation("2006-01-02", t.Date, time.Local)
 				if err != nil {
-					log.Printf("ToVigilAccounts: parse date %q for transaction %q: %v", t.Date, t.TransactionID, err)
+					Infof("ToVigilAccounts: parse date %q for transaction %q: %v", t.Date, t.TransactionID, err)
 					continue
 				}
 
@@ -373,7 +387,7 @@ func ToVigilAccounts(ctx *PlaidContext) (map[string]*VigilAccount, error) {
 				})
 			}
 
-			log.Printf("ToVigilAccounts: mapped %q -> %q (%d transactions)", plaidAccount.Name, vigilName, len(acc.Transactions))
+			Infof("ToVigilAccounts: mapped %q -> %q (%d transactions)", plaidAccount.Name, vigilName, len(acc.Transactions))
 		}
 	}
 
@@ -442,4 +456,21 @@ func Call[T, U any](endpoint string, req T) (*U, error) {
 	}
 
 	return &result, nil
+}
+
+func Info(v ...any) {
+	if !*vigilMode {
+		log.Println(v...)
+	}
+}
+
+func Infof(format string, v ...any) {
+	if !*vigilMode {
+		log.Printf(format, v...)
+	}
+}
+
+func Fatalf(format string, v ...any) {
+	log.Printf(format, v...)
+	os.Exit(1)
 }

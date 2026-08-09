@@ -4,44 +4,46 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"time"
 )
 
-func SeedVigil(vigilEpoch time.Time, vigilSeedFile string) error {
+func SeedVigil(vigilEpoch time.Time, vigilSeedFile string) (int, error) {
 	if vigilSeedFile == "" {
-		log.Printf("SeedVigil: no seed file, skipping seed")
-		return nil
+		Infof("SeedVigil: no seed file, skipping seed")
+		return 0, nil
 	}
 
-	log.Printf("SeedVigil: reading %q", vigilSeedFile)
+	Infof("SeedVigil: reading %q", vigilSeedFile)
 
 	accounts, err := ReadSeedFile(vigilSeedFile, vigilEpoch.UTC().Unix())
 	if err != nil {
-		return fmt.Errorf("read seed file: %w", err)
+		return 0, fmt.Errorf("read seed file: %w", err)
 	}
 
+	total := 0
 	for name, transactions := range accounts {
-		log.Printf("SeedVigil: importing %d seed transaction(s) into %q", len(transactions), name)
+		Infof("SeedVigil: importing %d seed transaction(s) into %q", len(transactions), name)
 
 		imported, err := ImportVigilTransactions(&VigilAccount{
 			Name:         name,
 			Transactions: transactions,
 		})
 		if err != nil {
-			return fmt.Errorf("seed account %q: %w", name, err)
+			return 0, fmt.Errorf("seed account %q: %w", name, err)
 		}
 
 		if imported == 0 {
-			log.Printf("SeedVigil: no transactions for %q, skipping", name)
+			Infof("SeedVigil: no transactions for %q, skipping", name)
 		} else {
-			log.Printf("SeedVigil: imported %d transactions into %q", imported, name)
+			Infof("SeedVigil: imported %d transactions into %q", imported, name)
 		}
+
+		total += imported
 	}
 
-	return nil
+	return total, nil
 }
 
 // TODO(clean up)
