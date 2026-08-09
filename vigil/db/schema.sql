@@ -13,10 +13,11 @@ CREATE TABLE Transactions (
   -- DEPOSIT, WITHDRAWAL
   Type TEXT NOT NULL,
   Amount REAL NOT NULL,
-  ExternalId TEXT NOT NULL UNIQUE,
+  ExternalId TEXT NOT NULL,
   Merchant TEXT NOT NULL,
   TransactionTimestamp INTEGER NOT NULL,
-  CommitTimestamp INTEGER NOT NULL
+  CommitTimestamp INTEGER NOT NULL,
+  UNIQUE (AccountId, ExternalId)
 );
 
 -- current share positions
