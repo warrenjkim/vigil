@@ -5,3 +5,4 @@ external/
 **/.DS_Store
 **/plaid-config.json
 **/seed.csv
+**/conduit_bin

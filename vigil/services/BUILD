@@ -13,6 +13,23 @@ cc_library(
 )
 
 cc_library(
+    name = "conduit_service",
+    srcs = ["conduit_service.cc"],
+    hdrs = ["conduit_service.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@pulse//pulse/core:error",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/json:parse",
+        "@pulse//pulse/json:value",
+        "@pulse//pulse/process:output",
+        "@pulse//pulse/process:run",
+        "@pulse//pulse/strings:cat",
+    ],
+)
+
+cc_library(
     name = "trade_service",
     srcs = ["trade_service.cc"],
     hdrs = ["trade_service.h"],

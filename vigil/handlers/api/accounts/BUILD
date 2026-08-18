@@ -78,3 +78,21 @@ cc_library(
         "@pulse//pulse/json:value",
     ],
 )
+
+cc_library(
+    name = "conduit_sync_handler",
+    srcs = ["conduit_sync_handler.cc"],
+    hdrs = ["conduit_sync_handler.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vigil/services:conduit_service",
+        "@pulse//pulse/core:log",
+        "@pulse//pulse/core:result",
+        "@pulse//pulse/core:stringify",
+        "@pulse//pulse/http:handler",
+        "@pulse//pulse/http:method",
+        "@pulse//pulse/http:request",
+        "@pulse//pulse/http:response",
+        "@pulse//pulse/json:value",
+    ],
+)

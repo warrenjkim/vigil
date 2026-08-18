@@ -12,6 +12,7 @@
 #include "vigil/db/merchant_aliases_dao.h"
 #include "vigil/db/trades_dao.h"
 #include "vigil/db/transactions_dao.h"
+#include "vigil/handlers/api/accounts/conduit_sync_handler.h"
 #include "vigil/handlers/api/accounts/create_account_handler.h"
 #include "vigil/handlers/api/accounts/delete_account_handler.h"
 #include "vigil/handlers/api/accounts/get_account_handler.h"
@@ -28,12 +29,13 @@
 #include "vigil/handlers/pages/health_handler.h"
 #include "vigil/handlers/pages/static_handler.h"
 #include "vigil/services/account_service.h"
+#include "vigil/services/conduit_service.h"
 #include "vigil/services/trade_service.h"
 #include "vigil/services/transaction_service.h"
 
 // TODO(move to pulse)
 const char* GetFlag(int argc, char** argv, const char* flag,
-                    const char* default_value) {
+                    const char* default_value = "") {
   for (int i = 1; i < argc; i++) {
     if (strncmp(argv[i], flag, strlen(flag)) == 0) {
       if (const char* eq = strchr(argv[i], '='); eq != nullptr) {
@@ -49,8 +51,8 @@ using StaticHandlers = pulse::http::Routes<vigil::StaticFileHandlers>;
 
 using AccountHandlers =
     pulse::http::Routes<vigil::CreateAccountHandler, vigil::GetAccountHandler,
-                        vigil::DeleteAccountHandler,
-                        vigil::ListAccountsHandler>;
+                        vigil::DeleteAccountHandler, vigil::ListAccountsHandler,
+                        vigil::ConduitSyncHandler>;
 
 using TransactionHandlers =
     pulse::http::Routes<vigil::ImportTransactionsHandler,
@@ -84,11 +86,16 @@ int main(int argc, char** argv) {
   vigil::TradeService trade_service(&db, &trades_dao, &holdings_dao);
   vigil::TransactionService transaction_service(&db, &accounts_dao,
                                                 &transactions_dao);
+  vigil::ConduitService conduit_service(
+      GetFlag(argc, argv, "--vigil_base_url", "http://localhost:8080"),
+      GetFlag(argc, argv, "--conduit_path"),
+      GetFlag(argc, argv, "--plaid_config"),
+      GetFlag(argc, argv, "--vigil_seed_file"));
 
-  pulse::http::ServerContext<vigil::AccountsDao*, vigil::TransactionsDao*,
-                             vigil::HoldingsDao*, vigil::MerchantAliasesDao*,
-                             vigil::TradesDao*, vigil::AccountService*,
-                             vigil::TradeService*, vigil::TransactionService*>
+  pulse::http::ServerContext<
+      vigil::AccountsDao*, vigil::TransactionsDao*, vigil::HoldingsDao*,
+      vigil::MerchantAliasesDao*, vigil::TradesDao*, vigil::AccountService*,
+      vigil::TradeService*, vigil::TransactionService*, vigil::ConduitService*>
       ctx;
   ctx.set(&accounts_dao);
   ctx.set(&transactions_dao);
@@ -99,13 +106,14 @@ int main(int argc, char** argv) {
   ctx.set(&account_service);
   ctx.set(&trade_service);
   ctx.set(&transaction_service);
+  ctx.set(&conduit_service);
 
   pulse::http::Server server(
       pulse::UnwrapOrDie(
           pulse::http::Router::Make<pulse::http::Routes<
               StaticHandlers, ApiRoutes, vigil::ConsoleHandler<ApiRoutes>>>(
               ctx)),
-      {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 1});
+      {.port = atoi(GetFlag(argc, argv, "--port", "8080")), .threads = 40});
   server.Run();
 
   return 0;

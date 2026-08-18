@@ -5,7 +5,7 @@ import {
   costBasisMap,
 } from "/static/domain.js";
 import { formatPrice, formatShares, formatDate } from "/static/format.js";
-import { fetchJson } from "/static/api.js";
+import { fetchJson, postJson } from "/static/api.js";
 
 const ACTIVITY_LIMIT = 10;
 
@@ -247,5 +247,26 @@ async function load() {
   }
 }
 
-document.getElementById("refresh-button").addEventListener("click", load);
+async function sync() {
+  const btn = document.getElementById("sync-button");
+  btn.disabled = true;
+  btn.textContent = "syncing...";
+
+  try {
+    const { imported } = await postJson("/accounts/sync");
+    btn.textContent = `synced ${imported}`;
+    await load();
+  } catch (e) {
+    document.getElementById("timestamp").textContent =
+      "sync error: " + e.message;
+    console.error("sync failed:", e);
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "sync";
+    }, 2000);
+  }
+}
+
+document.getElementById("sync-button").addEventListener("click", sync);
 document.addEventListener("DOMContentLoaded", load);

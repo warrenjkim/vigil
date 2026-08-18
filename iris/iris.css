@@ -65,7 +65,7 @@ hr {
   justify-content: space-between;
   align-items: center;
 }
-button.refresh {
+button.sync {
   background: #1d2021;
   border: 1px solid #3c3836;
   color: #665c54;
@@ -76,9 +76,20 @@ button.refresh {
   padding: 0.2rem 0.6rem;
   cursor: pointer;
 }
-button.refresh:hover {
+button.sync:hover {
   color: #a89984;
   border-color: #665c54;
+}
+button.sync:disabled {
+  color: #3c3836;
+  border-color: #232323;
+  cursor: not-allowed;
+}
+.header-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
 }
 
 .summary-grid {
