@@ -3,8 +3,7 @@
 #include <string>
 
 #include "pulse/core/enum_macros.h"
-#include "pulse/core/stringify.h"
-#include "pulse/strings/cat.h"
+#include "pulse/reflect/mirror.h"
 #include "vigil/db/time.h"
 
 namespace vigil {
@@ -13,7 +12,7 @@ namespace vigil {
   X(kDeposit, "DEPOSIT")          \
   X(kWithdrawal, "WITHDRAWAL")
 
-struct Transaction {
+struct pulse_reflect Transaction {
   PULSE_ENUM(Type, TRANSACTION_TYPE_TABLE);
 
   int id;
@@ -32,14 +31,6 @@ PULSE_STRING_TO_ENUM(Transaction::Type, ToTransactionType,
 
 }  // namespace vigil
 
-PULSE_ENUM_TO_STRING(vigil::Transaction::Type, TRANSACTION_TYPE_TABLE);
+#include "vigil/db/transaction.reflect.h"  // IWYU pragma: keep
 
-template <>
-struct pulse::Stringify<vigil::Transaction> {
-  static std::string ToString(const vigil::Transaction& t) {
-    return pulse::strings::Cat(
-        "Transaction{.id=", t.id, ",.account_name=", t.account_name,
-        ",.type=", t.type, ",.amount=", t.amount, ",.merchant=", t.merchant,
-        ",.timestamp=", t.transaction_timestamp, "}");
-  }
-};
+PULSE_ENUM_TO_STRING(vigil::Transaction::Type, TRANSACTION_TYPE_TABLE);

@@ -2,12 +2,11 @@
 
 #include <string>
 
-#include "pulse/core/stringify.h"
-#include "pulse/strings/cat.h"
+#include "pulse/reflect/mirror.h"
 
 namespace vigil {
 
-struct Holding {
+struct pulse_reflect Holding {
   int id;
   std::string account_name;
   std::string ticker;
@@ -18,11 +17,4 @@ struct Holding {
 
 }  // namespace vigil
 
-template <>
-struct pulse::Stringify<vigil::Holding> {
-  static std::string ToString(const vigil::Holding& h) {
-    return pulse::strings::Cat(
-        "Holding{.id=", h.id, ",.account_name=", h.account_name,
-        ",.ticker=", h.ticker, ",.shares=", h.shares, "}");
-  }
-};
+#include "vigil/db/holding.reflect.h"  // IWYU pragma: keep

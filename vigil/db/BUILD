@@ -1,3 +1,5 @@
+load("@pulse//bazel:cc.bzl", "cc_library")
+
 genrule(
     name = "schema_sql_h",
     srcs = ["schema.sql"],
@@ -55,6 +57,7 @@ cc_library(
     deps = [
         "@pulse//pulse/core:enum_macros",
         "@pulse//pulse/core:stringify",
+        "@pulse//pulse/reflect:mirror",
     ],
 )
 
@@ -102,7 +105,7 @@ cc_library(
         ":time",
         "@pulse//pulse/core:enum_macros",
         "@pulse//pulse/core:stringify",
-        "@pulse//pulse/strings:cat",
+        "@pulse//pulse/reflect:mirror",
     ],
 )
 
@@ -142,8 +145,7 @@ cc_library(
     hdrs = ["holding.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "@pulse//pulse/core:stringify",
-        "@pulse//pulse/strings:cat",
+        "@pulse//pulse/reflect:mirror",
     ],
 )
 
@@ -181,8 +183,7 @@ cc_library(
     hdrs = ["merchant_alias.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "@pulse//pulse/core:stringify",
-        "@pulse//pulse/strings:cat",
+        "@pulse//pulse/reflect:mirror",
     ],
 )
 
@@ -222,7 +223,7 @@ cc_library(
         ":time",
         "@pulse//pulse/core:enum_macros",
         "@pulse//pulse/core:stringify",
-        "@pulse//pulse/strings:cat",
+        "@pulse//pulse/reflect:mirror",
     ],
 )
 

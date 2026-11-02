@@ -4,8 +4,7 @@
 #include <string>
 
 #include "pulse/core/enum_macros.h"
-#include "pulse/core/stringify.h"
-#include "pulse/strings/cat.h"
+#include "pulse/reflect/mirror.h"
 #include "vigil/db/time.h"
 
 namespace vigil {
@@ -14,7 +13,7 @@ namespace vigil {
   X(kBuy, "BUY")            \
   X(kSell, "SELL")
 
-struct Trade {
+struct pulse_reflect Trade {
   PULSE_ENUM(Type, TRADE_TYPE_TABLE);
 
   int id;
@@ -33,16 +32,6 @@ PULSE_STRING_TO_ENUM(Trade::Type, to_trade_type, TRADE_TYPE_TABLE);
 
 }  // namespace vigil
 
-PULSE_ENUM_TO_STRING(vigil::Trade::Type, TRADE_TYPE_TABLE);
+#include "vigil/db/trade.reflect.h"  // IWYU pragma: keep
 
-template <>
-struct pulse::Stringify<vigil::Trade> {
-  static std::string ToString(const vigil::Trade& t) {
-    return pulse::strings::Cat(
-        "Trade{.id=", t.id, ",.account_name=", t.account_name,
-        ",.type=", t.type, ",.ticker=", t.ticker, ",.shares=", t.shares,
-        ",.price=", t.price, ",.description=",
-        t.description.has_value() ? *t.description : "std::nullopt",
-        ",.trade_timestamp=", t.trade_timestamp, "}");
-  }
-};
+PULSE_ENUM_TO_STRING(vigil::Trade::Type, TRADE_TYPE_TABLE);

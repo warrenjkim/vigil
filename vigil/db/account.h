@@ -4,8 +4,7 @@
 #include <string>
 
 #include "pulse/core/enum_macros.h"
-#include "pulse/core/stringify.h"
-#include "pulse/strings/cat.h"
+#include "pulse/reflect/mirror.h"
 
 namespace vigil {
 
@@ -18,7 +17,7 @@ namespace vigil {
   X(kTraditionalIra, "TRADITIONAL_IRA") \
   X(kCreditCard, "CREDIT_CARD")
 
-struct Account {
+struct pulse_reflect Account {
   PULSE_ENUM(Type, ACCOUNT_TYPE_TABLE);
 
   int id;
@@ -33,13 +32,6 @@ PULSE_STRING_TO_ENUM(Account::Type, ToAccountType, ACCOUNT_TYPE_TABLE);
 
 }  // namespace vigil
 
-PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE);
+#include "vigil/db/account.reflect.h"  // IWYU pragma: keep
 
-template <>
-struct pulse::Stringify<vigil::Account> {
-  static std::string ToString(const vigil::Account& account) {
-    return pulse::strings::Cat("Account{.id=", account.id,
-                               ",.name=", account.name, ",.type=", account.type,
-                               "}");
-  }
-};
+PULSE_ENUM_TO_STRING(vigil::Account::Type, ACCOUNT_TYPE_TABLE);
